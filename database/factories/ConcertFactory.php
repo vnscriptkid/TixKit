@@ -35,4 +35,12 @@ class ConcertFactory extends Factory
             'additional_information' => 'Feel free to contact us by email: example@gmail.com'
         ];
     }
+
+    public function published() {
+        return $this->state(function() {
+            return [
+                'published_at' => Carbon::parse('-1 week') 
+            ];
+        }); 
+    }
 }

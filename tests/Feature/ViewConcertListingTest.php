@@ -15,11 +15,11 @@ class ViewConcertListingTest extends TestCase
      *
      * @return void
      */
-    public function test_user_can_view_a_concert_listing()
+    public function test_user_can_view_a_published_concert_listing()
     {
         $this->withoutExceptionHandling();
         // Arrange
-        $concert = Concert::create([
+        $concert = Concert::factory()->published()->create([
             'title' => 'Vietnamese traditional folks dance',
             'subtitle' => 'with some experts on the field',
             'date' => Carbon::parse('December 20, 2020 8:00pm'),
@@ -29,7 +29,7 @@ class ViewConcertListingTest extends TestCase
             'city' => 'Hanoi',
             'state' => 'North',
             'zip' => '20056',
-            'additional_information' => 'Feel free to contact us by email: folkdance@gmail.com'
+            'additional_information' => 'Feel free to contact us by email: folkdance@gmail.com',
         ]);
 
         // Actions
@@ -48,5 +48,16 @@ class ViewConcertListingTest extends TestCase
         $response->assertSeeText($concert['state']);
         $response->assertSeeText($concert['zip']);
         $response->assertSeeText($concert['additional_information']);
+    }
+
+    public function test_user_can_not_view_unpublished_concert() 
+    {
+        $concert = Concert::factory()->create([
+            'published_at' => null
+        ]);
+
+        $response = $this->get('/concerts/' . $concert->id);
+
+        $response->assertStatus(404);
     }
 }

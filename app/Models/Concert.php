@@ -11,7 +11,11 @@ class Concert extends Model
     use HasFactory;
 
     protected $guarded = [];
-    protected $dates = ['date'];
+    protected $dates = ['date', 'published_at'];
+
+    public function scopePublished($query) {
+        return $query->whereNotNull('published_at');
+    }
 
     public function getTicketPriceInDollarsAttribute() {
         return number_format($this->ticket_price / 100, 2);

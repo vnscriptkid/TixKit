@@ -14,4 +14,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/concerts/{concert}', [ConcertsController::class, 'show']);
+Route::get('/concerts/{id}', [ConcertsController::class, 'show']);

@@ -44,8 +44,10 @@ class ConcertsController extends Controller
      * @param  \App\Models\Concert  $concert
      * @return \Illuminate\Http\Response
      */
-    public function show(Concert $concert)
+    public function show($id)
     {
+        $concert = Concert::published()->findOrFail($id);
+
         return view('concerts.show', compact('concert'));
     }
 
