@@ -46,7 +46,7 @@ class ConcertModelTest extends TestCase
     {
         $publishedConcert1 = Concert::factory()->published()->create();
         $publishedConcert2 = Concert::factory()->published()->create();
-        $unpublishedConcert = Concert::factory()->create([ 'published_at' => null ]);
+        $unpublishedConcert = Concert::factory()->unpublished()->create();
 
         $concerts = Concert::published()->get();
 
