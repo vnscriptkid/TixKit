@@ -13,6 +13,17 @@ class Concert extends Model
     protected $guarded = [];
     protected $dates = ['date', 'published_at'];
 
+    public function orderTickets($email, $ticketQuantity)
+    {
+        $order = $this->orders()->create([
+            'email' => $email
+        ]);
+
+        foreach (range(1, $ticketQuantity) as $i) {
+            $order->tickets()->create();
+        }
+    }
+
     public function orders()
     {
         return $this->hasMany(Order::class);
