@@ -14,6 +14,8 @@ class PurchaseTicketTest extends TestCase
 {
     use RefreshDatabase;
 
+    private FakePaymentGateway $paymentGateway;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -34,7 +36,7 @@ class PurchaseTicketTest extends TestCase
     }
 
 
-    public function test_user_can_purchase_ticket()
+    public function test_user_can_purchase_ticket_to_a_published_concert()
     {
         // Arrange
         $concert = Concert::factory()->published()->create([
@@ -151,6 +153,27 @@ class PurchaseTicketTest extends TestCase
 
         // Assert
         $response->assertStatus(422);
+
+        // order is not created
+        $order = $concert->orders()->where(['email' => 'john@gmail.com'])->first();
+        $this->assertNull($order);
+    }
+
+
+    public function test_cannot_purchase_tickets_to_an_unpublished_concert()
+    {
+        // Arrange
+        $concert = Concert::factory()->unpublished()->create();
+
+        // Act
+        $response = $this->orderTickets($concert, [
+            'email' => 'john@gmail.com',
+            'ticket_quantity' => 3,
+            'payment_token' => $this->paymentGateway->getValidTestToken()
+        ]);
+
+        // Assert
+        $response->assertStatus(404);
 
         // order is not created
         $order = $concert->orders()->where(['email' => 'john@gmail.com'])->first();

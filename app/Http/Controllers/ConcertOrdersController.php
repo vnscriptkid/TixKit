@@ -24,7 +24,7 @@ class ConcertOrdersController extends Controller
             'payment_token' => 'required'
         ]);
 
-        $concert = Concert::findOrFail($concertId);
+        $concert = Concert::published()->findOrFail($concertId);
 
         $amount = request('ticket_quantity') * $concert->ticket_price;
 
