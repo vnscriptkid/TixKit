@@ -72,5 +72,6 @@ class Concert extends Model
         foreach (range(1, $numberOfTickets) as $i) {
             $this->tickets()->create([]);
         }
+        return $this;
     }
 }
