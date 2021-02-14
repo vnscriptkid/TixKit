@@ -13,18 +13,15 @@ class OrderModelTest extends TestCase
 
     public function test_order_can_be_canceled()
     {
-        // create a concert
-        $concert = Concert::factory()->published()->create();
-        $concert->addTickets(10);
-
-        // create an order
+        // Arrange
+        $concert = Concert::factory()->published()->create()->addTickets(10);
         $order = $concert->orderTickets('john@gmail.com', 5);
         $this->assertEquals($concert->ticketsRemaining(), 5);
 
-        // cancel that order
+        // Act
         $order->cancel();
 
-        // assert: order not longer exists, tickets are deleted
+        // Assert
         $this->assertEquals($concert->ticketsRemaining(), 10);
         $this->assertNull(Order::find($order->id));
     }

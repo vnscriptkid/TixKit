@@ -50,10 +50,8 @@ class PurchaseTicketTest extends TestCase
 
         // Assert
         $response->assertStatus(201);
-        $this->assertEquals($this->paymentGateway->totalCharges(), 3740 * 3);
-        $order = $concert->orders()->where(['email' => 'john@gmail.com'])->first();
-        $this->assertNotNull($order);
-        $this->assertEquals(3, $order->tickets()->count());
+        $this->assertTrue($concert->hasOrderFrom('john@gmail.com'));
+        $this->assertEquals(3, $concert->ordersFrom('john@gmail.com')->first()->ticketCount());
     }
 
     public function email_is_required_to_purchase_tickets()
@@ -147,8 +145,7 @@ class PurchaseTicketTest extends TestCase
 
         // Assert
         $response->assertStatus(422);
-        $order = $concert->orders()->where(['email' => 'john@gmail.com'])->first();
-        $this->assertNull($order);
+        $this->assertFalse($concert->hasOrderFrom('join@gmail.com'));
         $this->assertEquals($concert->ticketsRemaining(), 3);
     }
 
@@ -167,8 +164,7 @@ class PurchaseTicketTest extends TestCase
 
         // Assert
         $response->assertStatus(404);
-        $order = $concert->orders()->where(['email' => 'john@gmail.com'])->first();
-        $this->assertNull($order);
+        $this->assertFalse($concert->hasOrderFrom('join@gmail.com'));
         $this->assertEquals($this->paymentGateway->totalCharges(), 0);
     }
 
@@ -186,8 +182,7 @@ class PurchaseTicketTest extends TestCase
 
         // Assert
         $response->assertStatus(422);
-        $order = $concert->orders()->where(['email' => 'john@gmail.com'])->first();
-        $this->assertNull($order);
+        $this->assertFalse($concert->hasOrderFrom('join@gmail.com'));
         $this->assertEquals($this->paymentGateway->totalCharges(), 0);
         $this->assertEquals($concert->ticketsRemaining(), 50);
     }

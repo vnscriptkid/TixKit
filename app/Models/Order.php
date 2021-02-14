@@ -16,6 +16,11 @@ class Order extends Model
         return $this->hasMany(Ticket::class);
     }
 
+    public function ticketCount()
+    {
+        return $this->tickets()->count();
+    }
+
     public function cancel()
     {
         // release all tickets associated

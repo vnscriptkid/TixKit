@@ -74,4 +74,14 @@ class Concert extends Model
         }
         return $this;
     }
+
+    public function hasOrderFrom($email)
+    {
+        return $this->ordersFrom($email)->count() > 0;
+    }
+
+    public function ordersFrom($email)
+    {
+        return $this->orders()->where(['email' => $email]);
+    }
 }
