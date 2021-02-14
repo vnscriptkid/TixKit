@@ -13,13 +13,13 @@ class OrderModelTest extends TestCase
 
     public function test_order_is_converted_to_array()
     {
-        $concert = Concert::factory()->published()->create()->addTickets(10);
+        $concert = Concert::factory()->published()->create(['ticket_price' => 1200])->addTickets(10);
         $order = $concert->orderTickets('john@gmail.com', 5);
 
         $this->assertEquals($order->toArray(), [
             'email' => 'john@gmail.com',
             'ticket_quantity' => 5,
-            'amount' => $concert->ticket_price * $order->ticketQuantity()
+            'amount' => 6000
         ]);
     }
 

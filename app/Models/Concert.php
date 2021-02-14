@@ -22,7 +22,8 @@ class Concert extends Model
             throw new NotEnoughTicketsException;
 
         $order = $this->orders()->create([
-            'email' => $email
+            'email' => $email,
+            'amount' => $ticketQuantity * $this->ticket_price
         ]);
 
         foreach ($availableTickets as $ticket) {
