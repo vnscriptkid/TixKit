@@ -20,7 +20,7 @@ class Order extends Model
     {
         // release all tickets associated
         foreach ($this->tickets as $ticket) {
-            $ticket->update(['order_id' => null]);
+            $ticket->release();
         }
 
         // delete order itself
