@@ -11,11 +11,7 @@ use Tests\TestCase;
 class ConcertModelTest extends TestCase
 {
     use RefreshDatabase;
-    /**
-     * A basic unit test example.
-     *
-     * @return void
-     */
+
     public function test_get_ticket_price_in_dollars()
     {
         $concert = Concert::factory()->make(['ticket_price' => 3450]);

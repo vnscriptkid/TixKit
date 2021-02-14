@@ -50,8 +50,13 @@ class PurchaseTicketTest extends TestCase
 
         // Assert
         $response->assertStatus(201);
+        $response->assertJsonFragment([
+            'email' => 'john@gmail.com',
+            'ticket_quantity' => 3,
+            'amount' => 3740 * 3
+        ]);
         $this->assertTrue($concert->hasOrderFrom('john@gmail.com'));
-        $this->assertEquals(3, $concert->ordersFrom('john@gmail.com')->first()->ticketCount());
+        $this->assertEquals(3, $concert->ordersFrom('john@gmail.com')->first()->ticketQuantity());
     }
 
     public function email_is_required_to_purchase_tickets()

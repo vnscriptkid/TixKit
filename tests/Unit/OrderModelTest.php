@@ -11,6 +11,18 @@ class OrderModelTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_order_is_converted_to_array()
+    {
+        $concert = Concert::factory()->published()->create()->addTickets(10);
+        $order = $concert->orderTickets('john@gmail.com', 5);
+
+        $this->assertEquals($order->toArray(), [
+            'email' => 'john@gmail.com',
+            'ticket_quantity' => 5,
+            'amount' => $concert->ticket_price * $order->ticketQuantity()
+        ]);
+    }
+
     public function test_order_can_be_canceled()
     {
         // Arrange
