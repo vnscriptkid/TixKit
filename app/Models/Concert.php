@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\NotEnoughTicketsException;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,18 +16,30 @@ class Concert extends Model
 
     public function orderTickets($email, $ticketQuantity)
     {
+        $availableTickets = $this->tickets()->available()->take($ticketQuantity)->get();
+
+        if ($availableTickets->count() < $ticketQuantity)
+            throw new NotEnoughTicketsException;
+
         $order = $this->orders()->create([
             'email' => $email
         ]);
 
-        foreach (range(1, $ticketQuantity) as $i) {
-            $order->tickets()->create();
+        foreach ($availableTickets as $ticket) {
+            $order->tickets()->save($ticket);
         }
+
+        return $order;
     }
 
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
     }
 
     public function scopePublished($query)
@@ -47,5 +60,17 @@ class Concert extends Model
     public function getFormattedStartTimeAttribute()
     {
         return $this->date->isoFormat('h:mma');
+    }
+
+    public function ticketsRemaining()
+    {
+        return $this->tickets()->available()->count();
+    }
+
+    public function addTickets($numberOfTickets)
+    {
+        foreach (range(1, $numberOfTickets) as $i) {
+            $this->tickets()->create([]);
+        }
     }
 }
