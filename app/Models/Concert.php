@@ -88,4 +88,11 @@ class Concert extends Model
     {
         return $this->orders()->where(['email' => $email]);
     }
+
+    public function reserveTickets($quantityNeeded)
+    {
+        return $this->findTickets($quantityNeeded)->each(function ($ticket) {
+            $ticket->reserve();
+        });
+    }
 }
