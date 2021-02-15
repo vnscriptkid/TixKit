@@ -17,7 +17,7 @@ class CreateOrdersTable extends Migration
             $table->id();
             $table->string('email');
             $table->integer('amount')->nullable();
-            $table->unsignedBigInteger('concert_id');
+            $table->unsignedBigInteger('concert_id')->nullable();
             $table->foreign('concert_id')->references('id')->on('concerts');
             $table->timestamps();
         });

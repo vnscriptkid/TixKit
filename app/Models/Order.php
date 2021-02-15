@@ -18,7 +18,7 @@ class Order extends Model
 
     public function concert()
     {
-        return $this->belongsTo(Concert::class);
+        return $this->belongsToMany(Concert::class, 'tickets');
     }
 
     public function ticketQuantity()

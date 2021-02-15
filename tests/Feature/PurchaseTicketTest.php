@@ -35,9 +35,9 @@ class PurchaseTicketTest extends TestCase
         $this->assertArrayHasKey($field, $response->decodeResponseJson()['errors']);
     }
 
-
     public function test_user_can_purchase_ticket_to_a_published_concert()
     {
+        $this->withoutExceptionHandling();
         // Arrange
         $concert = Concert::factory()->published()->create(['ticket_price' => 3740])->addTickets(3);
 
