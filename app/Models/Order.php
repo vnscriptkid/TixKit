@@ -11,6 +11,20 @@ class Order extends Model
 
     protected $guarded = [];
 
+    public static function forTickets($email, $tickets)
+    {
+        $order = self::create([
+            'email' => $email,
+            'amount' => $tickets->sum('price')
+        ]);
+
+        foreach ($tickets as $ticket) {
+            $order->tickets()->save($ticket);
+        }
+
+        return $order;
+    }
+
     public function tickets()
     {
         return $this->hasMany(Ticket::class);
