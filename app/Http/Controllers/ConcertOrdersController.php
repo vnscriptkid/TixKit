@@ -28,14 +28,14 @@ class ConcertOrdersController extends Controller
 
         $concert = Concert::published()->findOrFail($concertId);
 
-        $amount = request('ticket_quantity') * $concert->ticket_price;
-
         try {
             $tickets = $concert->findTickets(request('ticket_quantity'));
 
+            $amount = $tickets->sum('price');
+
             $this->paymentGateway->charge($amount, request('payment_token'));
 
-            $order = Order::forTickets(request('email'), $tickets);
+            $order = Order::forTickets(request('email'), $tickets, $amount);
 
             return response()->json($order, 201);
         } catch (PaymentFailedException $e) {

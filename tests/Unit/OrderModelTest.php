@@ -38,17 +38,18 @@ class OrderModelTest extends TestCase
         $this->assertNull(Order::find($order->id));
     }
 
-    public function test_creating_order_from_tickets_and_email()
+    public function test_creating_order_from_tickets_and_email_and_amount()
     {
         // Arrange
-        $concert = Concert::factory()->published()->create()->addTickets(10);
-        $tickets = $concert->findTickets(3);
+        $concert = Concert::factory()->published()->create(['ticket_price' => 1200])->addTickets(10);
+        $tickets = $concert->findTickets(5);
 
         // Act
-        $order = Order::forTickets('john@gmail.com', $tickets);
+        $order = Order::forTickets('john@gmail.com', $tickets, 6000);
 
         // Assert
         $this->assertEquals($order->email, 'john@gmail.com');
-        $this->assertEquals($concert->ticketsRemaining(), 7);
+        $this->assertEquals($order->amount, 6000);
+        $this->assertEquals($concert->ticketsRemaining(), 5);
     }
 }
