@@ -89,12 +89,12 @@ class Concert extends Model
         return $this->orders()->where(['email' => $email]);
     }
 
-    public function reserveTickets($quantityNeeded)
+    public function reserveTickets($email, $quantityNeeded)
     {
         $tickets = $this->findTickets($quantityNeeded)->each(function ($ticket) {
             $ticket->reserve();
         });
 
-        return new Reservation($tickets);
+        return new Reservation($email, $tickets);
     }
 }

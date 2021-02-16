@@ -113,25 +113,26 @@ class ConcertModelTest extends TestCase
         $this->fail("Order succeeded even though there were not enough tickets remaining.");
     }
 
-    public function test_reserving_tickets_before_charging()
+    public function test_reserving_tickets_for_an_email_before_charging()
     {
         $concert = Concert::factory()->published()->create();
         $concert->addTickets(5);
 
-        $reservation = $concert->reserveTickets(2);
+        $reservation = $concert->reserveTickets('john@gmail.com', 2);
 
         $this->assertEquals($concert->ticketsRemaining(), 3);
         $this->assertCount(2, $reservation->tickets());
+        $this->assertEquals('john@gmail.com', $reservation->email());
     }
 
     public function test_can_not_reserve_tickets_that_has_already_been_purchased()
     {
         $concert = Concert::factory()->published()->create();
         $concert->addTickets(4);
-        $concert->reserveTickets(3);
+        $concert->reserveTickets('john@gmail.com', 3);
 
         try {
-            $concert->reserveTickets(2);
+            $concert->reserveTickets('jane@gmail.com', 2);
         } catch (NotEnoughTicketsException $e) {
             $this->assertEquals($concert->ticketsRemaining(), 1);
             return;
@@ -144,10 +145,10 @@ class ConcertModelTest extends TestCase
     {
         $concert = Concert::factory()->published()->create();
         $concert->addTickets(4);
-        $concert->reserveTickets(3);
+        $concert->reserveTickets('john@gmail.com', 3);
 
         try {
-            $concert->reserveTickets(2);
+            $concert->reserveTickets('jane@gmail.com', 2);
         } catch (NotEnoughTicketsException $e) {
             $this->assertEquals($concert->ticketsRemaining(), 1);
             return;

@@ -37,4 +37,19 @@ class OrderModelTest extends TestCase
         $this->assertEquals($order->amount, 6000);
         $this->assertEquals($concert->ticketsRemaining(), 5);
     }
+
+    public function test_creating_order_from_reservation()
+    {
+        // Arrange
+        $concert = Concert::factory()->published()->create(['ticket_price' => 1200])->addTickets(10);
+        $reservation = $concert->reserveTickets('john@gmail.com', 5);
+
+        // Act
+        $order = Order::forReservation($reservation);
+
+        // Assert
+        $this->assertEquals($order->email, 'john@gmail.com');
+        $this->assertEquals($order->amount, 6000);
+        $this->assertEquals($concert->ticketsRemaining(), 5);
+    }
 }

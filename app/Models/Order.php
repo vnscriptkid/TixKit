@@ -11,6 +11,20 @@ class Order extends Model
 
     protected $guarded = [];
 
+    public static function forReservation(Reservation $reservation)
+    {
+        $order = self::create([
+            'email' => $reservation->email(),
+            'amount' => $reservation->totalPrice()
+        ]);
+
+        foreach ($reservation->tickets() as $ticket) {
+            $order->tickets()->save($ticket);
+        }
+
+        return $order;
+    }
+
     public static function forTickets($email, $tickets, $amount)
     {
         $order = self::create([
