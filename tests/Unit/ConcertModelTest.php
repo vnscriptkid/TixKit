@@ -118,10 +118,10 @@ class ConcertModelTest extends TestCase
         $concert = Concert::factory()->published()->create();
         $concert->addTickets(5);
 
-        $reservedTickets = $concert->reserveTickets(2);
+        $reservation = $concert->reserveTickets(2);
 
         $this->assertEquals($concert->ticketsRemaining(), 3);
-        $this->assertCount(2, $reservedTickets);
+        $this->assertCount(2, $reservation->tickets());
     }
 
     public function test_can_not_reserve_tickets_that_has_already_been_purchased()

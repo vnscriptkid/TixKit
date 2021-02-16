@@ -43,4 +43,18 @@ class ReservationModelTest extends TestCase
             $ticket->shouldHaveReceived('release');
         });
     }
+
+    public function test_get_tickets()
+    {
+        // Arrange
+        $tickets = collect([
+            (object) ['price' => 1000],
+            (object) ['price' => 1000],
+        ]);
+        // Act
+        $reservation = new Reservation($tickets);
+
+        // Assert
+        $this->assertEquals($reservation->tickets(), $tickets);
+    }
 }
