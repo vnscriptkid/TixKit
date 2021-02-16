@@ -191,4 +191,42 @@ class PurchaseTicketTest extends TestCase
         $this->assertEquals($this->paymentGateway->totalCharges(), 0);
         $this->assertEquals($concert->ticketsRemaining(), 50);
     }
+
+    public function test_2_users_trying_to_compete_the_same_tickets()
+    {
+        $this->withoutExceptionHandling();
+        // Arrange
+        $concert = Concert::factory()->published()->create(['ticket_price' => 1000])->addTickets(2);
+
+        $this->paymentGateway->beforeFirstCharge(function () use ($concert) {
+            // userB start competing
+            $savedRequest = $this->app['request'];
+
+            $response = $this->orderTickets($concert, [
+                'email' => 'userComingLater@gmail.com',
+                'ticket_quantity' => 1,
+                'payment_token' => $this->paymentGateway->getValidTestToken()
+            ]);
+
+            $this->app['request'] = $savedRequest;
+
+            $response->assertStatus(422);
+            $this->assertFalse($concert->hasOrderFrom('userComingLater@gmail.com'));
+            $this->assertEquals($this->paymentGateway->totalCharges(), 0);
+            $this->assertEquals($concert->ticketsRemaining(), 0);
+        });
+
+        // Act
+        $response = $this->orderTickets($concert, [
+            'email' => 'userComingFirst@gmail.com',
+            'ticket_quantity' => 2,
+            'payment_token' => $this->paymentGateway->getValidTestToken()
+        ]);
+
+        // Assert
+        $response->assertStatus(201);
+        $this->assertTrue($concert->hasOrderFrom('userComingFirst@gmail.com'));
+        $this->assertEquals(2, $concert->ordersFrom('userComingFirst@gmail.com')->first()->ticketQuantity());
+        $this->assertEquals($this->paymentGateway->totalCharges(), 2000);
+    }
 }
