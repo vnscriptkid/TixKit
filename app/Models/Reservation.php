@@ -34,4 +34,9 @@ class Reservation
     {
         return $this->email;
     }
+
+    public function complete()
+    {
+        return Order::forTickets($this->email(), $this->tickets(), $this->totalPrice());
+    }
 }
