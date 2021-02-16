@@ -3,6 +3,7 @@
 namespace Tests\Unit\Billing;
 
 use App\Billing\FakePaymentGateway;
+use App\Billing\StripePaymentGateway;
 use Tests\TestCase;
 
 class StripePaymentTest extends TestCase
@@ -18,11 +19,12 @@ class StripePaymentTest extends TestCase
             ],
         ], ['api_key' => config('services.stripe.secret')])->id;
 
-        dd($token);
-        // $paymentGateway = new FakePaymentGateway();
+        $paymentGateway = new StripePaymentGateway(config('services.stripe.secret'));
 
-        // $paymentGateway->charge(1200, $paymentGateway->getValidTestToken());
+        $paymentGateway->charge(1200, $token);
 
-        // $this->assertEquals($paymentGateway->totalCharges(), 1200);
+        $lastStripeCharge = \Stripe\Charge::all(['limit' => 1], ['api_key' => config('services.stripe.secret')])['data'][0];
+
+        $this->assertEquals($lastStripeCharge['amount'], 1200);
     }
 }
