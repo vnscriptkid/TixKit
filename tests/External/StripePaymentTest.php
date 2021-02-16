@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Billing;
+namespace Tests\External;
 
 use App\Billing\FakePaymentGateway;
 use App\Billing\StripePaymentGateway;
