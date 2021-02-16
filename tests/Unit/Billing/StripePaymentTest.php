@@ -8,11 +8,17 @@ use Tests\TestCase;
 
 class StripePaymentTest extends TestCase
 {
-    public function test_charges_with_valid_token_are_successful()
-    {
-        $lastCharge = \Stripe\Charge::all(['limit' => 1], ['api_key' => config('services.stripe.secret')])['data'][0];
+    private $paymentGateway;
 
-        $token = \Stripe\Token::create([
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->paymentGateway = new StripePaymentGateway(config('services.stripe.secret'));
+    }
+
+    private function validToken()
+    {
+        return \Stripe\Token::create([
             'card' => [
                 'number' => '4242424242424242',
                 'exp_month' => 1,
@@ -20,16 +26,32 @@ class StripePaymentTest extends TestCase
                 'cvc' => '123',
             ],
         ], ['api_key' => config('services.stripe.secret')])->id;
+    }
 
-        $paymentGateway = new StripePaymentGateway(config('services.stripe.secret'));
+    private function lastCharge()
+    {
+        return \Stripe\Charge::all(['limit' => 1], ['api_key' => config('services.stripe.secret')])['data'][0];
+    }
 
-        $paymentGateway->charge(1200, $token);
-
-        $newCharge = \Stripe\Charge::all(
+    private function newerChargesThan($lastCharge)
+    {
+        $newCharges = \Stripe\Charge::all(
             ['limit' => 1, 'ending_before' => $lastCharge->id],
             ['api_key' => config('services.stripe.secret')]
-        )['data'][0];
+        )['data'];
 
-        $this->assertEquals($newCharge['amount'], 1200);
+        return collect($newCharges);
+    }
+
+    public function test_charges_with_valid_token_are_successful()
+    {
+        $lastCharge = $this->lastCharge();
+
+        $this->paymentGateway->charge(1200, $this->validToken());
+
+        $newerCharges = $this->newerChargesThan($lastCharge);
+
+        $this->assertCount(1, $newerCharges);
+        $this->assertEquals($newerCharges->first()['amount'], 1200);
     }
 }
