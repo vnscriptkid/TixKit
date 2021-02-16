@@ -24,16 +24,12 @@ class TicketModelTest extends TestCase
 
     public function test_ticket_can_be_released()
     {
-        // Arrange
-        $concert = Concert::factory()->published()->create()->addTickets(1);
-        $order = $concert->orderTickets('john@gmail.com', 1);
-        $ticket = $order->tickets()->first();
-        $this->assertNotNull($ticket->order_id);
+        $ticket = Ticket::factory()->reserved()->create();
 
-        // Act
+        $this->assertNotNull($ticket->reserved_at);
+
         $ticket->release();
 
-        // Assert
-        $this->assertNull($ticket->order_id);
+        $this->assertNull($ticket->reserved_at);
     }
 }

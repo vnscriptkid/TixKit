@@ -4,6 +4,10 @@ namespace Tests\Unit;
 
 use App\Models\Concert;
 use App\Models\Reservation;
+use App\Models\Ticket;
+use Carbon\Carbon;
+use Mockery;
+use Mockery\LegacyMockInterface;
 use Tests\TestCase;
 
 class ReservationModelTest extends TestCase
@@ -20,5 +24,23 @@ class ReservationModelTest extends TestCase
 
         // Assert
         $this->assertEquals($reservation->totalPrice(), 2000);
+    }
+
+    public function test_reservation_can_be_cancelled()
+    {
+        // Arrange
+        $tickets = collect([
+            Mockery::spy(Ticket::class),
+            Mockery::spy(Ticket::class),
+            Mockery::spy(Ticket::class),
+        ]);
+        // Act
+        $reservation = new Reservation($tickets);
+        $reservation->cancel();
+
+        // Assert
+        $tickets->each(function (LegacyMockInterface $ticket) {
+            $ticket->shouldHaveReceived('release');
+        });
     }
 }
