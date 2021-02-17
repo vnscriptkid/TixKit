@@ -2,6 +2,8 @@
 
 namespace App\Billing;
 
+use Stripe\Exception\InvalidRequestException;
+
 class StripePaymentGateway implements PaymentGateway
 {
     private $apiKey;
@@ -13,10 +15,14 @@ class StripePaymentGateway implements PaymentGateway
 
     public function charge($amount, $token)
     {
-        $stripeCharge = \Stripe\Charge::create([
-            'amount' => $amount,
-            'source' => $token,
-            'currency' => 'usd',
-        ], ['api_key' => $this->apiKey]);
+        try {
+            $stripeCharge = \Stripe\Charge::create([
+                'amount' => $amount,
+                'source' => $token,
+                'currency' => 'usd',
+            ], ['api_key' => $this->apiKey]);
+        } catch (InvalidRequestException $e) {
+            throw new PaymentFailedException;
+        }
     }
 }
