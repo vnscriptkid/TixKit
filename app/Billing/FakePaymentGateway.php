@@ -12,7 +12,7 @@ class FakePaymentGateway implements PaymentGateway
         $this->charges = collect();
     }
 
-    public function getValidTestToken()
+    public function getValidToken()
     {
         return 'good token';
     }
@@ -25,11 +25,20 @@ class FakePaymentGateway implements PaymentGateway
             $cb->__invoke($this);
         }
 
-        if ($token !== $this->getValidTestToken()) {
+        if ($token !== $this->getValidToken()) {
             throw new PaymentFailedException;
         }
 
         $this->charges[] = $amount;
+    }
+
+    public function getNewChargesDuring($callback)
+    {
+        $currentSize = $this->charges->count();
+
+        $callback->__invoke($this);
+
+        return $this->charges->skip($currentSize)->values();
     }
 
     public function totalCharges()
