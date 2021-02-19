@@ -71,4 +71,9 @@ class Order extends Model
             'amount' => $this->amount
         ];
     }
+
+    public static function findByConfirmationNumber($confirmationNumber)
+    {
+        return self::where('confirmation_number', $confirmationNumber)->firstOrFail();
+    }
 }

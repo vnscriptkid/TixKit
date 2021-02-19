@@ -7,13 +7,9 @@ use Illuminate\Http\Request;
 
 class OrdersController extends Controller
 {
-    public function show($confirmation_number)
+    public function show($confirmationNumber)
     {
-        $order = Order::where('confirmation_number', $confirmation_number)->first();
-
-        if ($order === null) {
-            return response()->json([], 404);
-        }
+        $order = Order::findByConfirmationNumber($confirmationNumber);
 
         return view('orders.show', compact('order'));
     }

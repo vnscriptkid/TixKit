@@ -24,6 +24,7 @@ class OrderFactory extends Factory
     {
         return [
             'email' => 'example@gmail.com',
+            'confirmation_number' => 'CONFIRMATIONNUMBER123',
             'amount' => 1000,
             'concert_id' => function () {
                 return Concert::factory()->create()->id;

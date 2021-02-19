@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Concert;
 use App\Models\Order;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -51,5 +52,34 @@ class OrderModelTest extends TestCase
         $this->assertEquals($order->email, 'john@gmail.com');
         $this->assertEquals($order->amount, 6000);
         $this->assertEquals($concert->ticketsRemaining(), 5);
+    }
+
+    public function test_find_by_confirmation_number_successfully()
+    {
+        // Arrange
+        $order = Order::factory()->create(['confirmation_number' => 'CONFIRMATIONNUMBERXYZ']);
+
+        // Act
+        $foundOrder = Order::findByConfirmationNumber('CONFIRMATIONNUMBERXYZ');
+
+        // Assert
+        $this->assertEquals($order->id, $foundOrder->id);
+    }
+
+    public function test_find_by_non_existed_confirmation_number_throws_exception()
+    {
+        // Arrange
+        Order::factory()->create();
+
+        // Act
+        try {
+            Order::findByConfirmationNumber('NON_EXISTED_NUMBER');
+        } catch (ModelNotFoundException $e) {
+            // Assert
+            $this->assertNotNull($e);
+            return;
+        }
+
+        $this->fail();
     }
 }
