@@ -17,6 +17,7 @@ class CreateOrdersTable extends Migration
             $table->id();
             $table->string('confirmation_number')->nullable(); //TODO: add unique later
             $table->string('email');
+            $table->string('card_last_four');
             $table->integer('amount')->nullable();
             $table->unsignedBigInteger('concert_id')->nullable();
             $table->foreign('concert_id')->references('id')->on('concerts');

@@ -16,27 +16,35 @@ class ViewOrderTest extends TestCase
     {
         $this->withoutExceptionHandling();
         // Arrange
-        // Create concert
         $concert = Concert::factory()->create();
-        // Create order
         $order = Order::factory()->create([
-            'confirmation_number' => 'CONFIRMATIONNUMBER123'
+            'confirmation_number' => 'CONFIRMATIONNUMBER123',
+            'amount' => 4550,
+            'card_last_four' => '4242'
         ]);
-        // Create tickets
         Ticket::factory()->create([
             'concert_id' => $concert->id,
-            'order_id' => $order->id
+            'order_id' => $order->id,
+            'code' => 'TICKETCODE123'
+        ]);
+        Ticket::factory()->create([
+            'concert_id' => $concert->id,
+            'order_id' => $order->id,
+            'code' => 'TICKETCODE456'
         ]);
 
         // Act
-        // View order
         $response = $this->get("/orders/{$order->confirmation_number}");
 
         // Assert
         $response->assertStatus(200);
-        // Correct info
         $response->assertViewHas('order', function ($viewOrder) use ($order) {
             return $viewOrder->id === $order->id;
         });
+        $response->assertSee('$45.50');
+        $response->assertSee('CONFIRMATIONNUMBER123');
+        $response->assertSee('**** **** **** 4242');
+        $response->assertSee('TICKETCODE123');
+        $response->assertSee('TICKETCODE456');
     }
 }
