@@ -4,18 +4,16 @@ namespace Database\Factories;
 
 use App\Models\Concert;
 use App\Models\Order;
-use App\Models\Ticket;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class TicketFactory extends Factory
+class OrderFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Ticket::class;
+    protected $model = Order::class;
 
     /**
      * Define the model's default state.
@@ -25,21 +23,11 @@ class TicketFactory extends Factory
     public function definition()
     {
         return [
+            'email' => 'example@gmail.com',
+            'amount' => 1000,
             'concert_id' => function () {
                 return Concert::factory()->create()->id;
-            },
-            'order_id' => function () {
-                return Order::factory()->create()->id;
             }
         ];
-    }
-
-    public function reserved()
-    {
-        return $this->state(function () {
-            return [
-                'reserved_at' => Carbon::now()
-            ];
-        });
     }
 }
