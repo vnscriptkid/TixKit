@@ -38,7 +38,7 @@ class FakePaymentGateway implements PaymentGateway
 
         $callback->__invoke($this);
 
-        return $this->charges->skip($currentSize)->values();
+        return $this->charges->skip($currentSize)->reverse()->values();
     }
 
     public function totalCharges()

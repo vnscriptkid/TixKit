@@ -57,7 +57,7 @@ class StripePaymentGateway implements PaymentGateway
     private function getNewChargesSince($lastCharge)
     {
         return \Stripe\Charge::all(
-            ['limit' => 1, 'ending_before' => $lastCharge->id],
+            ['ending_before' => $lastCharge->id],
             ['api_key' => config('services.stripe.secret')]
         )['data'];
     }
