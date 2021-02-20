@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Concert;
 use App\Models\Order;
+use App\Models\Ticket;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -14,13 +15,19 @@ class OrderModelTest extends TestCase
 
     public function test_order_is_converted_to_array()
     {
-        $concert = Concert::factory()->published()->create(['ticket_price' => 1200])->addTickets(10);
-        $order = $concert->orderTickets('john@gmail.com', 5);
+        $order = Order::factory()->create([
+            'email' => 'john@gmail.com',
+            'amount' => 6000,
+            'confirmation_number' => 'CONFIRMED123'
+        ]);
+
+        $order->tickets()->saveMany(Ticket::factory(10)->create());
 
         $this->assertEquals($order->toArray(), [
             'email' => 'john@gmail.com',
-            'ticket_quantity' => 5,
-            'amount' => 6000
+            'ticket_quantity' => 10,
+            'amount' => 6000,
+            'confirmation_number' => 'CONFIRMED123'
         ]);
     }
 
