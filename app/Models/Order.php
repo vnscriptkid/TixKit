@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\OrderConfirmationNumberGenerator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,25 +12,12 @@ class Order extends Model
 
     protected $guarded = [];
 
-    public static function forReservation(Reservation $reservation)
-    {
-        $order = self::create([
-            'email' => $reservation->email(),
-            'amount' => $reservation->totalPrice()
-        ]);
-
-        foreach ($reservation->tickets() as $ticket) {
-            $order->tickets()->save($ticket);
-        }
-
-        return $order;
-    }
-
     public static function forTickets($email, $tickets, $amount)
     {
         $order = self::create([
             'email' => $email,
-            'amount' => $amount
+            'amount' => $amount,
+            'confirmation_number' => app(OrderConfirmationNumberGenerator::class)->generate()
         ]);
 
         foreach ($tickets as $ticket) {
@@ -68,7 +56,8 @@ class Order extends Model
         return [
             'email' => $this->email,
             'ticket_quantity' => $this->ticketQuantity(),
-            'amount' => $this->amount
+            'amount' => $this->amount,
+            'confirmation_number' => $this->confirmation_number
         ];
     }
 
