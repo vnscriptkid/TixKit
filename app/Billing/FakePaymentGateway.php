@@ -2,19 +2,25 @@
 
 namespace App\Billing;
 
+use Illuminate\Support\Str;
+
 class FakePaymentGateway implements PaymentGateway
 {
     private $charges;
+    private $tokens;
     private $beforeFirstChargeCallback;
 
     public function __construct()
     {
         $this->charges = collect();
+        $this->tokens = collect(); // [token => cardNumber]
     }
 
-    public function getValidToken()
+    public function getValidToken($cardNumber = '4242424242424242')
     {
-        return 'good token';
+        $token = 'fake-tok_' . Str::random(24);
+        $this->tokens[$token] = $cardNumber;
+        return $token;
     }
 
     public function charge($amount, $token)
@@ -25,11 +31,14 @@ class FakePaymentGateway implements PaymentGateway
             $cb->__invoke($this);
         }
 
-        if ($token !== $this->getValidToken()) {
+        if (!$this->tokens->has($token)) {
             throw new PaymentFailedException;
         }
 
-        $this->charges[] = $amount;
+        return $this->charges[] = new Charge([
+            'amount' => $amount,
+            'card_last_four' => substr($this->tokens[$token], -4)
+        ]);
     }
 
     public function getNewChargesDuring($callback)
@@ -43,7 +52,7 @@ class FakePaymentGateway implements PaymentGateway
 
     public function totalCharges()
     {
-        return $this->charges->sum();
+        return $this->charges->map->amount()->sum();
     }
 
     public function beforeFirstCharge(callable $callback)

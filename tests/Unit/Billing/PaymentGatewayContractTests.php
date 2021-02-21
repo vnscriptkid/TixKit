@@ -21,7 +21,7 @@ trait PaymentGatewayContractTests
         });
 
         $this->assertCount(2, $newCharges);
-        $this->assertEquals([3000, 1200], $newCharges->all());
+        $this->assertEquals([3000, 1200], $newCharges->map->amount()->all());
     }
 
     public function test_charges_with_valid_token_are_successful()
@@ -33,7 +33,7 @@ trait PaymentGatewayContractTests
         });
 
         $this->assertCount(1, $newCharges);
-        $this->assertEquals($newCharges->first(), 1200);
+        $this->assertEquals($newCharges->first()->amount(), 1200);
     }
 
     public function test_charges_with_invalid_token_fail()
@@ -50,5 +50,14 @@ trait PaymentGatewayContractTests
         });
 
         $this->assertCount(0, $newCharges);
+    }
+
+    function test_can_get_details_about_a_successful_charge()
+    {
+        $paymentGateway = $this->getPaymentGateway();
+
+        $charge = $paymentGateway->charge(1000, $paymentGateway->getValidToken());
+
+        $this->assertEquals('4242', $charge->cardLastFour());
     }
 }

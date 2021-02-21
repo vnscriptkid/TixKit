@@ -15,9 +15,9 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->string('confirmation_number'); //TODO: add unique later
+            $table->string('confirmation_number')->unique();
             $table->string('email');
-            $table->string('card_last_four')->nullable();
+            $table->string('card_last_four');
             $table->integer('amount')->nullable();
             $table->unsignedBigInteger('concert_id')->nullable();
             $table->foreign('concert_id')->references('id')->on('concerts');
