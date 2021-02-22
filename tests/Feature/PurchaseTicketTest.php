@@ -7,8 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Billing\FakePaymentGateway;
 use App\Billing\PaymentGateway;
-use App\OrderConfirmationNumberGenerator;
-use Mockery;
+use App\Facades\OrderConfirmationNumber;
 
 class PurchaseTicketTest extends TestCase
 {
@@ -57,10 +56,7 @@ class PurchaseTicketTest extends TestCase
         // Arrange
         $concert = Concert::factory()->published()->create(['ticket_price' => 3740])->addTickets(3);
 
-        $orderConfirmationNumberGenerator = Mockery::mock(OrderConfirmationNumberGenerator::class, [
-            'generate' => 'NUMBER123'
-        ]);
-        $this->app->instance(OrderConfirmationNumberGenerator::class, $orderConfirmationNumberGenerator);
+        OrderConfirmationNumber::shouldReceive('generate')->andReturn('NUMBER123');
 
         // Act
         $this->orderTickets($concert, [
