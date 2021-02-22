@@ -12,11 +12,12 @@ class Order extends Model
 
     protected $guarded = [];
 
-    public static function forTickets($email, $tickets, $amount)
+    public static function forTickets($email, $tickets, $charge)
     {
         $order = self::create([
             'email' => $email,
-            'amount' => $amount,
+            'amount' => $charge->amount(),
+            'card_last_four' => $charge->cardLastFour(),
             'confirmation_number' => OrderConfirmationNumber::generate()
         ]);
 

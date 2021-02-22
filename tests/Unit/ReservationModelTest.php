@@ -3,11 +3,9 @@
 namespace Tests\Unit;
 
 use App\Billing\FakePaymentGateway;
-use App\Models\Concert;
 use App\Models\Order;
 use App\Models\Reservation;
 use App\Models\Ticket;
-use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Mockery\LegacyMockInterface;
@@ -79,8 +77,7 @@ class ReservationModelTest extends TestCase
 
     public function test_completing_a_reservation_to_get_an_order()
     {
-        $concert = Concert::factory()->create(['ticket_price' => 1000]);
-        $tickets = Ticket::factory(3)->create(['concert_id' => $concert->id]);
+        $tickets = Ticket::factory(3)->create(['order_id' => null]);
         $reservation = new Reservation('john@gmail.com', $tickets);
         $paymentGateway = new FakePaymentGateway();
 
@@ -89,6 +86,6 @@ class ReservationModelTest extends TestCase
         $this->assertInstanceOf(Order::class, $order);
         $this->assertEquals($order->ticketQuantity(), 3);
         $this->assertEquals($order->email, 'john@gmail.com');
-        $this->assertEquals($order->amount, 3000);
+        $this->assertEquals($order->amount, $reservation->totalPrice());
     }
 }

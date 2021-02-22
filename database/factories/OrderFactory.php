@@ -26,6 +26,7 @@ class OrderFactory extends Factory
             'email' => 'example@gmail.com',
             'confirmation_number' => 'CONFIRMATIONNUMBER123',
             'amount' => 1000,
+            'card_last_four' => '4242424242424242',
             'concert_id' => function () {
                 return Concert::factory()->create()->id;
             }
