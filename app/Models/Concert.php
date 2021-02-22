@@ -13,18 +13,6 @@ class Concert extends Model
     protected $guarded = [];
     protected $dates = ['date', 'published_at'];
 
-    public function orderTickets($email, $ticketQuantity)
-    {
-        $availableTickets = $this->findTickets($ticketQuantity);
-
-        return $this->createOrder($email, $availableTickets);
-    }
-
-    public function createOrder($email, $tickets)
-    {
-        return Order::forTickets($email, $tickets, $tickets->sum('price'));
-    }
-
     public function findTickets($ticketQuantityNeeded)
     {
         $tickets = $this->tickets()->available()->take($ticketQuantityNeeded)->get();

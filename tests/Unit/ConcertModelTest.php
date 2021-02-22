@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Exceptions\NotEnoughTicketsException;
 use App\Models\Concert;
+use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -65,11 +66,11 @@ class ConcertModelTest extends TestCase
     public function test_tickets_remaining_does_not_include_purchased_ones()
     {
         // Arrange
-        $concert = Concert::factory()->published()->create();
-        $concert->addTickets(5);
+        $concert = Concert::factory()->published()->create()->addTickets(5);
 
         // Act
-        $concert->orderTickets('join@gmail.com', 2);
+        $order = Order::factory()->create();
+        $order->tickets()->saveMany($concert->tickets->take(2));
 
         // Assert
         $this->assertEquals($concert->ticketsRemaining(), 3);
@@ -82,7 +83,7 @@ class ConcertModelTest extends TestCase
 
         try {
             // Act
-            $concert->orderTickets('john@gmail.com', 6);
+            $concert->reserveTickets('john@gmail.com', 6);
         } catch (NotEnoughTicketsException $e) {
             // Assert
             $this->assertEquals($concert->ticketsRemaining(), 5);
@@ -96,16 +97,16 @@ class ConcertModelTest extends TestCase
     function test_can_not_order_tickets_that_have_already_been_purchased()
     {
         // Arrange
-        $concert = Concert::factory()->published()->create();
-        $concert->addTickets(5);
-        $concert->orderTickets('join@gmail.com', 3);
+        $concert = Concert::factory()->published()->create()->addTickets(10);
+        $order = Order::factory()->create();
+        $order->tickets()->saveMany($concert->tickets->take(6));
 
         try {
             // Act
-            $concert->orderTickets('jane@gmail.com', 3);
+            $concert->reserveTickets('jane@gmail.com', 5);
         } catch (NotEnoughTicketsException $e) {
             // Assert
-            $this->assertEquals($concert->ticketsRemaining(), 2);
+            $this->assertEquals($concert->ticketsRemaining(), 4);
             $this->assertFalse($concert->hasOrderFrom('jane@gmail.com'));
             return;
         }
