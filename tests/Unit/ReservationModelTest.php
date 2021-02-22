@@ -84,7 +84,7 @@ class ReservationModelTest extends TestCase
         $reservation = new Reservation('john@gmail.com', $tickets);
         $paymentGateway = new FakePaymentGateway();
 
-        $order = $reservation->complete($paymentGateway, $paymentGateway->getValidToken());
+        $order = $reservation->complete($paymentGateway, $paymentGateway->getValidTestToken());
 
         $this->assertInstanceOf(Order::class, $order);
         $this->assertEquals($order->ticketQuantity(), 3);

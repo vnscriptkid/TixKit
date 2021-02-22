@@ -6,7 +6,7 @@ use App\Billing\StripePaymentGateway;
 use Tests\TestCase;
 use Tests\Unit\Billing\PaymentGatewayContractTests;
 
-class StripeGatewayTest extends TestCase
+class StripePaymentGatewayTest extends TestCase
 {
     use PaymentGatewayContractTests;
 

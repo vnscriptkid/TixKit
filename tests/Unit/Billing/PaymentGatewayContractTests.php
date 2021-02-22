@@ -12,12 +12,12 @@ trait PaymentGatewayContractTests
     {
         $paymentGateway = $this->getPaymentGateway();
 
-        $paymentGateway->charge(1000, $paymentGateway->getValidToken());
-        $paymentGateway->charge(2000, $paymentGateway->getValidToken());
+        $paymentGateway->charge(1000, $paymentGateway->getValidTestToken());
+        $paymentGateway->charge(2000, $paymentGateway->getValidTestToken());
 
         $newCharges = $paymentGateway->getNewChargesDuring(function ($gateway) {
-            $gateway->charge(1200, $gateway->getValidToken());
-            $gateway->charge(3000, $gateway->getValidToken());
+            $gateway->charge(1200, $gateway->getValidTestToken());
+            $gateway->charge(3000, $gateway->getValidTestToken());
         });
 
         $this->assertCount(2, $newCharges);
@@ -29,7 +29,7 @@ trait PaymentGatewayContractTests
         $paymentGateway = $this->getPaymentGateway();
 
         $newCharges = $paymentGateway->getNewChargesDuring(function ($gateway) {
-            $gateway->charge(1200, $gateway->getValidToken());
+            $gateway->charge(1200, $gateway->getValidTestToken());
         });
 
         $this->assertCount(1, $newCharges);
@@ -56,8 +56,8 @@ trait PaymentGatewayContractTests
     {
         $paymentGateway = $this->getPaymentGateway();
 
-        $charge = $paymentGateway->charge(1000, $paymentGateway->getValidToken());
+        $charge = $paymentGateway->charge(1000, $paymentGateway->getValidTestToken($paymentGateway::TEST_CARD_NUMBER));
 
-        $this->assertEquals('4242', $charge->cardLastFour());
+        $this->assertEquals(substr($paymentGateway::TEST_CARD_NUMBER, -4), $charge->cardLastFour());
     }
 }

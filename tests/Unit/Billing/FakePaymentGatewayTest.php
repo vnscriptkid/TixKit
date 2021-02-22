@@ -3,7 +3,7 @@
 namespace Tests\Unit\Billing;
 
 use App\Billing\FakePaymentGateway;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class FakePaymentGatewayTest extends TestCase
 {
@@ -21,11 +21,11 @@ class FakePaymentGatewayTest extends TestCase
 
         $paymentGateway->beforeFirstCharge(function ($paymentGateway) use (&$callbackRan) {
             $callbackRan++;
-            $paymentGateway->charge(1000, $paymentGateway->getValidToken());
+            $paymentGateway->charge(1000, $paymentGateway->getValidTestToken());
             $this->assertEquals($paymentGateway->totalCharges(), 1000);
         });
 
-        $paymentGateway->charge(1000, $paymentGateway->getValidToken());
+        $paymentGateway->charge(1000, $paymentGateway->getValidTestToken());
 
         $this->assertEquals($paymentGateway->totalCharges(), 2000);
         $this->assertEquals($callbackRan, 1);
