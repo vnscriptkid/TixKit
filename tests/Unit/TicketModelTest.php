@@ -6,11 +6,19 @@ use App\Facades\TicketCode;
 use App\Models\Order;
 use App\Models\Ticket;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
 use Tests\TestCase;
 
 class TicketModelTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Mockery::getConfiguration()->allowMockingNonExistentMethods(false);
+    }
+
 
     public function test_ticket_can_be_reserved()
     {
@@ -39,7 +47,7 @@ class TicketModelTest extends TestCase
         // Arrange
         $ticket = Ticket::factory()->create();
         $order = Order::factory()->create();
-        TicketCode::shouldReceive('generate')->andReturn('CODE123');
+        TicketCode::shouldReceive('generateFor')->with($ticket)->andReturn('CODE123');
         $this->assertEquals($ticket->code, null);
 
         // Act
