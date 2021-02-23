@@ -8,6 +8,7 @@ use Tests\TestCase;
 use App\Billing\FakePaymentGateway;
 use App\Billing\PaymentGateway;
 use App\Facades\OrderConfirmationNumber;
+use App\Facades\TicketCode;
 
 class PurchaseTicketTest extends TestCase
 {
@@ -57,6 +58,7 @@ class PurchaseTicketTest extends TestCase
         $concert = Concert::factory()->published()->create(['ticket_price' => 3740])->addTickets(3);
 
         OrderConfirmationNumber::shouldReceive('generate')->andReturn('NUMBER123');
+        TicketCode::shouldReceive('generateFor')->andReturn('CODE1', 'CODE2', 'CODE3');
 
         // Act
         $this->orderTickets($concert, [
@@ -72,9 +74,9 @@ class PurchaseTicketTest extends TestCase
             'amount' => 3740 * 3,
             'confirmation_number' => 'NUMBER123',
             'tickets' => [
-                'code' => 'CODE1',
-                'code' => 'CODE2',
-                'code' => 'CODE3',
+                ['code' => 'CODE1'],
+                ['code' => 'CODE2'],
+                ['code' => 'CODE3'],
             ]
         ]);
         $this->assertTrue($concert->hasOrderFrom('john@gmail.com'));
