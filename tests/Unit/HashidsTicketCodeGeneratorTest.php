@@ -10,7 +10,7 @@ class HashidsTicketCodeGeneratorTest extends TestCase
 {
     public function test_code_is_at_least_6_characters()
     {
-        $generator = new HashidsTicketCodeGenerator;
+        $generator = new HashidsTicketCodeGenerator('salt1');
 
         $code = $generator->generateFor(new Ticket(['id' => 1]));
 
@@ -19,7 +19,7 @@ class HashidsTicketCodeGeneratorTest extends TestCase
 
     public function test_code_contains_uppercase_letters()
     {
-        $generator = new HashidsTicketCodeGenerator;
+        $generator = new HashidsTicketCodeGenerator('salt1');
 
         $code = $generator->generateFor(new Ticket(['id' => 1]));
 
@@ -28,7 +28,7 @@ class HashidsTicketCodeGeneratorTest extends TestCase
 
     public function test_different_ids_generate_different_code()
     {
-        $generator = new HashidsTicketCodeGenerator;
+        $generator = new HashidsTicketCodeGenerator('salt1');
 
         $code1 = $generator->generateFor(new Ticket(['id' => 1]));
         $code2 = $generator->generateFor(new Ticket(['id' => 2]));
@@ -38,7 +38,7 @@ class HashidsTicketCodeGeneratorTest extends TestCase
 
     public function test_same_ids_generate_same_code()
     {
-        $generator = new HashidsTicketCodeGenerator;
+        $generator = new HashidsTicketCodeGenerator('salt1');
 
         $code1 = $generator->generateFor(new Ticket(['id' => 1]));
         $code2 = $generator->generateFor(new Ticket(['id' => 1]));
