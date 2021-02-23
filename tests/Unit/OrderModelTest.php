@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Ticket;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
 use Tests\TestCase;
 
 class OrderModelTest extends TestCase
@@ -42,7 +43,11 @@ class OrderModelTest extends TestCase
     public function test_creating_order_from_tickets_and_email_and_charge_object()
     {
         // Arrange
-        $tickets = Ticket::factory(5)->create(['order_id' => null]);
+        $tickets = collect([
+            Mockery::spy(Ticket::class),
+            Mockery::spy(Ticket::class),
+            Mockery::spy(Ticket::class),
+        ]);
         $charge = new Charge([
             'amount' => 3000,
             'card_last_four' => '4242'
@@ -54,6 +59,7 @@ class OrderModelTest extends TestCase
         // Assert
         $this->assertEquals($order->email, 'john@gmail.com');
         $this->assertEquals($order->amount, 3000);
+        $tickets->each->shouldHaveReceived('claimFor', [$order]);
     }
 
     public function test_find_by_confirmation_number_successfully()

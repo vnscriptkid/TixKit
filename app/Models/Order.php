@@ -25,6 +25,8 @@ class Order extends Model
             $order->tickets()->save($ticket);
         }
 
+        $tickets->each->claimFor($order);
+
         return $order;
     }
 

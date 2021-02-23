@@ -69,9 +69,13 @@ class PurchaseTicketTest extends TestCase
         $this->assertResponseStatus(201);
         $this->seeJsonSubset([
             'email' => 'john@gmail.com',
-            'ticket_quantity' => 3,
             'amount' => 3740 * 3,
-            'confirmation_number' => 'NUMBER123'
+            'confirmation_number' => 'NUMBER123',
+            'tickets' => [
+                'code' => 'CODE1',
+                'code' => 'CODE2',
+                'code' => 'CODE3',
+            ]
         ]);
         $this->assertTrue($concert->hasOrderFrom('john@gmail.com'));
         $this->assertEquals(3, $concert->ordersFrom('john@gmail.com')->first()->ticketQuantity());
