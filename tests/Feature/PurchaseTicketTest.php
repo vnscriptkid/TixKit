@@ -9,6 +9,8 @@ use App\Billing\FakePaymentGateway;
 use App\Billing\PaymentGateway;
 use App\Facades\OrderConfirmationNumber;
 use App\Facades\TicketCode;
+use App\Mail\OrderConfirmationEmail;
+use Illuminate\Support\Facades\Mail;
 
 class PurchaseTicketTest extends TestCase
 {
@@ -59,6 +61,7 @@ class PurchaseTicketTest extends TestCase
 
         OrderConfirmationNumber::shouldReceive('generate')->andReturn('NUMBER123');
         TicketCode::shouldReceive('generateFor')->andReturn('CODE1', 'CODE2', 'CODE3');
+        Mail::fake();
 
         // Act
         $this->orderTickets($concert, [
@@ -80,7 +83,13 @@ class PurchaseTicketTest extends TestCase
             ]
         ]);
         $this->assertTrue($concert->hasOrderFrom('john@gmail.com'));
-        $this->assertEquals(3, $concert->ordersFrom('john@gmail.com')->first()->ticketQuantity());
+        $order = $concert->ordersFrom('john@gmail.com')->first();
+        $this->assertEquals(3, $order->ticketQuantity());
+
+        Mail::assertSent(OrderConfirmationEmail::class, function ($mail) use ($order) {
+            return $mail->hasTo('john@gmail.com')
+                && $mail->order->id === $order->id;
+        });
     }
 
     public function email_is_required_to_purchase_tickets()
