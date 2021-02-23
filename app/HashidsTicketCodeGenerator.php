@@ -8,7 +8,7 @@ class HashidsTicketCodeGenerator implements TicketCodeGenerator
 {
     private Hashids $hashIds;
 
-    public function __construct(string $salt = 'DefaultSalt')
+    public function __construct(string $salt)
     {
         $this->hashIds = new Hashids($salt, 6, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
     }
