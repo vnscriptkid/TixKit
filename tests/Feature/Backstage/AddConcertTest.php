@@ -108,4 +108,29 @@ class AddConcertTest extends TestCase
         $response->assertSessionHasErrors(['title']);
         $this->assertEquals(Concert::count(), 0);
     }
+
+    public function test_subtitle_is_optional()
+    {
+        $this->withoutExceptionHandling();
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->from('/backstage/concerts/add')->post('/backstage/concerts', [
+            'title' => 'No Warning',
+            'subtitle' => '',
+            'additional_information' => "You must be 19 years of age to attend this concert.",
+            'date' => '2017-11-18',
+            'time' => '8:00pm',
+            'venue' => 'The Mosh Pit',
+            'venue_address' => '123 Fake St.',
+            'city' => 'Laraville',
+            'state' => 'ON',
+            'zip' => '12345',
+            'ticket_price' => '32.50',
+            'ticket_quantity' => '75',
+        ]);
+
+        tap(Concert::first(), function ($concert) {
+            $this->assertNull($concert->subtitle);
+        });
+    }
 }
