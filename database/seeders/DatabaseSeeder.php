@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Concert;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
@@ -28,5 +29,10 @@ class DatabaseSeeder extends Seeder
             'zip' => '20056',
             'additional_information' => 'Feel free to contact us by email: example@gmail.com'
         ])->addTickets(5);
+
+        User::factory()->create([
+            'email' => 'vnscriptkid@gmail.com',
+            'password' => bcrypt('123456')
+        ]);
     }
 }
