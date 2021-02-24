@@ -17,8 +17,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/', function () {
+    return 'Laravel';
+});
+
 Route::get('/concerts/{id}', [ConcertsController::class, 'show']);
 Route::post('/concerts/{id}/orders', [ConcertOrdersController::class, 'store']);
 Route::get('/orders/{confirmation_number}', [OrdersController::class, 'show']);
 
 Route::post('/login', [LoginController::class, 'login']);
+Route::get('/login', [LoginController::class, 'showLoginForm']);
