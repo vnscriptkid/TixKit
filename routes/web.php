@@ -22,7 +22,7 @@ Route::get('/', function () {
     return 'Laravel';
 });
 
-Route::get('/concerts/{id}', [ConcertsController::class, 'show']);
+Route::get('/concerts/{id}', [ConcertsController::class, 'show'])->name('concerts.show');
 Route::post('/concerts/{id}/orders', [ConcertOrdersController::class, 'store']);
 Route::get('/orders/{confirmation_number}', [OrdersController::class, 'show']);
 
@@ -30,6 +30,7 @@ Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/logout', [LoginController::class, 'logout']);
 Route::get('/login', [LoginController::class, 'showLoginForm']);
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/backstage/concerts/new', [BackstageConcertsController::class, 'create']);
+Route::middleware(['auth'])->prefix('backstage')->group(function () {
+    Route::get('/concerts/new', [BackstageConcertsController::class, 'create']);
+    Route::post('/concerts', [BackstageConcertsController::class, 'store']);
 });
