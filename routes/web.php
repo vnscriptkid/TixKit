@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Backstage\ConcertsController as BackstageConcertsController;
 use App\Http\Controllers\ConcertOrdersController;
 use App\Http\Controllers\ConcertsController;
 use App\Http\Controllers\LoginController;
@@ -26,4 +27,7 @@ Route::post('/concerts/{id}/orders', [ConcertOrdersController::class, 'store']);
 Route::get('/orders/{confirmation_number}', [OrdersController::class, 'show']);
 
 Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout']);
 Route::get('/login', [LoginController::class, 'showLoginForm']);
+
+Route::get('/backstage/concerts/new', [BackstageConcertsController::class, 'create']);

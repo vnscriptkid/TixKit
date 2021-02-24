@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
@@ -17,11 +16,20 @@ class LoginController extends Controller
         $credentials = request()->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
-            return redirect('/backstage/concerts');
+            return redirect('/backstage/concerts/new');
         }
 
-        return redirect('/login')->withErrors([
-            'email' => 'Invalid credentials.'
-        ]);
+        return redirect('/login')
+            ->withInput(['email' => request('email')])
+            ->withErrors([
+                'email' => 'Invalid credentials.'
+            ]);
+    }
+
+    public function logout()
+    {
+        Auth::logout();
+
+        return redirect('/login');
     }
 }
