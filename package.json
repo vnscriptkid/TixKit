@@ -20,6 +20,7 @@
         "vue-template-compiler": "^2.6.12"
     },
     "dependencies": {
+        "@fortawesome/fontawesome-free": "^5.15.2",
         "normalize.css": "^8.0.1",
         "suitcss-base": "^5.0.0",
         "vue": "^2.6.12"

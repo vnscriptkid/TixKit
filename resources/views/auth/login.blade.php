@@ -11,7 +11,7 @@
                     <label class="form-label pseudo-hidden">Email address</label>
                     <div class="input-group">
                         <span class="input-group-addon">
-                            @icon('user', 'text-dark-muted text-xs')
+                            <i class="far fa-user"></i>
                         </span>
                         <input type="email" name="email" class="form-control" placeholder="Email address" value="{{ old('email') }}">
                     </div>
@@ -20,7 +20,7 @@
                     <label class="form-label pseudo-hidden">Password</label>
                     <div class="input-group">
                         <span class="input-group-addon">
-                            @icon('lock-closed', 'text-dark-muted text-xs')
+                            <i class="fas fa-lock"></i>
                         </span>
                         <input type="password" name="password" class="form-control" placeholder="Password">
                     </div>
