@@ -54,8 +54,6 @@ class ConcertsController extends Controller
 
     public function index()
     {
-        $concerts = Concert::all();
-
-        return view('backstage.concerts.index', ['concerts' => $concerts]);
+        return view('backstage.concerts.index', ['concerts' => Auth::user()->concerts]);
     }
 }
