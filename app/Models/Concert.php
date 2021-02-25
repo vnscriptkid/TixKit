@@ -84,4 +84,9 @@ class Concert extends Model
 
         return new Reservation($email, $tickets);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

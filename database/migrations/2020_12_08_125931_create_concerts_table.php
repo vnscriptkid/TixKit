@@ -19,6 +19,7 @@ class CreateConcertsTable extends Migration
             $table->string('subtitle')->nullable();
             $table->dateTime('date');
             $table->integer('ticket_price');
+            $table->unsignedBigInteger('user_id');
             $table->string('venue');
             $table->string('venue_address');
             $table->string('city');
@@ -26,6 +27,7 @@ class CreateConcertsTable extends Migration
             $table->string('zip');
             $table->text('additional_information')->nullable();
             $table->dateTime('published_at')->nullable();
+            $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });
     }
