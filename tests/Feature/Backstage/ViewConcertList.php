@@ -4,13 +4,38 @@ namespace Tests\Feature\Backstage;
 
 use App\Models\Concert;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Testing\TestResponse;
+use PHPUnit\Framework\Assert;
 use Tests\TestCase;
 
 class ViewConcertList extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        TestResponse::macro('viewData', function ($key) {
+            return $this->original->getData()[$key];
+        });
+
+        Collection::macro('assertContains', function ($value) {
+            Assert::assertTrue(
+                $this->contains($value),
+                "Failed asserting that the collection contained the specified value."
+            );
+        });
+
+        Collection::macro('assertNotContains', function ($value) {
+            Assert::assertFalse(
+                $this->contains($value),
+                "Failed asserting that the collection did not contain the specified value."
+            );
+        });
+    }
 
     public function test_guests_can_not_view_promoters_concert_list()
     {
@@ -38,14 +63,11 @@ class ViewConcertList extends TestCase
         // Assert
         $response->assertStatus(200);
 
-        $concertsInView = $response->original->getData()['concerts'];
+        $response->viewData('concerts')->assertContains($concertA);
+        $response->viewData('concerts')->assertContains($concertD);
+        $response->viewData('concerts')->assertContains($concertE);
 
-        $this->assertCount(3, $concertsInView);
-        $this->assertTrue($concertsInView->contains($concertA));
-        $this->assertTrue($concertsInView->contains($concertD));
-        $this->assertTrue($concertsInView->contains($concertE));
-
-        $this->assertFalse($concertsInView->contains($concertB));
-        $this->assertFalse($concertsInView->contains($concertC));
+        $response->viewData('concerts')->assertNotContains($concertB);
+        $response->viewData('concerts')->assertNotContains($concertC);
     }
 }
