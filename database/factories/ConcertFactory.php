@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Concert;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -23,6 +24,9 @@ class ConcertFactory extends Factory
     public function definition()
     {
         return [
+            'user_id' => function () {
+                return User::factory()->create()->id;
+            },
             'title' => 'Example Title',
             'subtitle' => 'with some fake subTitles',
             'date' => Carbon::parse('+2 weeks'),
@@ -36,19 +40,21 @@ class ConcertFactory extends Factory
         ];
     }
 
-    public function published() {
-        return $this->state(function() {
+    public function published()
+    {
+        return $this->state(function () {
             return [
-                'published_at' => Carbon::parse('-1 week') 
+                'published_at' => Carbon::parse('-1 week')
             ];
-        }); 
+        });
     }
 
-    public function unpublished() {
-        return $this->state(function() {
+    public function unpublished()
+    {
+        return $this->state(function () {
             return [
                 'published_at' => null
             ];
-        }); 
+        });
     }
 }

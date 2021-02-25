@@ -157,4 +157,16 @@ class ConcertModelTest extends TestCase
 
         $this->fail("Reservation succeeded even though tickets were already reserved.");
     }
+
+    public function test_can_be_published()
+    {
+        $concert = Concert::factory()->create([
+            'published_at' => null
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        $concert->publish();
+
+        $this->assertTrue($concert->isPublished());
+    }
 }

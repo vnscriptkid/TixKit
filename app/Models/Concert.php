@@ -89,4 +89,14 @@ class Concert extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function isPublished()
+    {
+        return $this->published_at !== null;
+    }
+
+    public function publish()
+    {
+        $this->update(['published_at' => $this->freshTimestamp()]);
+    }
 }
