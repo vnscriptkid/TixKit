@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Concert;
 use Carbon\Carbon;
+use Database\Factories\ConcertFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,9 +18,8 @@ class ViewConcertListingTest extends TestCase
      */
     public function test_user_can_view_a_published_concert_listing()
     {
-        $this->withoutExceptionHandling();
         // Arrange
-        $concert = Concert::factory()->published()->create([
+        $concert = ConcertFactory::createPublished([
             'title' => 'Vietnamese traditional folks dance',
             'subtitle' => 'with some experts on the field',
             'date' => Carbon::parse('December 20, 2020 8:00pm'),
@@ -32,9 +32,9 @@ class ViewConcertListingTest extends TestCase
             'additional_information' => 'Feel free to contact us by email: folkdance@gmail.com',
         ]);
 
-        // Actions
+        // Action
         $response = $this->get('/concerts/' . $concert->id);
-        
+
         // Assert
         $response->assertStatus(200);
         $response->assertSeeText($concert['title']);
@@ -50,7 +50,7 @@ class ViewConcertListingTest extends TestCase
         $response->assertSeeText($concert['additional_information']);
     }
 
-    public function test_user_can_not_view_unpublished_concert() 
+    public function test_user_can_not_view_unpublished_concert()
     {
         $concert = Concert::factory()->unpublished()->create();
 

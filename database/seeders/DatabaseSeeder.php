@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Concert;
 use App\Models\User;
 use Carbon\Carbon;
+use Database\Factories\ConcertFactory;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -16,8 +17,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
-        $concert = Concert::factory()->create([
+        ConcertFactory::createPublished([
             'title' => 'Example Title',
             'subtitle' => 'with some fake subTitles',
             'date' => Carbon::parse('+2 weeks'),
@@ -30,7 +30,6 @@ class DatabaseSeeder extends Seeder
             'additional_information' => 'Feel free to contact us by email: example@gmail.com',
             'ticket_quantity' => 5
         ]);
-        $concert->publish();
 
         User::factory()->create([
             'email' => 'vnscriptkid@gmail.com',

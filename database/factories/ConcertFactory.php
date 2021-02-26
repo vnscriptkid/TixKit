@@ -41,13 +41,11 @@ class ConcertFactory extends Factory
         ];
     }
 
-    public function published()
+    public static function createPublished($overrides = [])
     {
-        return $this->state(function () {
-            return [
-                'published_at' => Carbon::parse('-1 week')
-            ];
-        });
+        $concert = Concert::factory()->create($overrides);
+        $concert->publish();
+        return $concert;
     }
 
     public function unpublished()

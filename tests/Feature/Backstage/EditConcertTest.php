@@ -5,6 +5,7 @@ namespace Tests\Feature\Backstage;
 use App\Models\Concert;
 use App\Models\User;
 use Carbon\Carbon;
+use Database\Factories\ConcertFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -76,7 +77,8 @@ class EditConcertTest extends TestCase
     public function test_promoters_cannot_view_the_edit_form_for_their_own_published_concerts()
     {
         $user = User::factory()->create();
-        $concert = Concert::factory()->published()->create(['user_id' => $user->id]);
+        $concert = ConcertFactory::createPublished(['user_id' => $user->id]);
+
         $this->assertTrue($concert->isPublished());
 
         $response = $this->actingAs($user)->get("/backstage/concerts/{$concert->id}/edit");
@@ -88,7 +90,7 @@ class EditConcertTest extends TestCase
     {
         $user = User::factory()->create();
         $otherUser = User::factory()->create();
-        $concertOfOther = Concert::factory()->create(['user_id' => $otherUser->id]);
+        $concertOfOther = ConcertFactory::createPublished(['user_id' => $otherUser->id]);
 
         $response = $this->actingAs($user)->get("/backstage/concerts/{$concertOfOther->id}/edit");
 
@@ -210,7 +212,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->published()->create($this->oldConcertData($user));
+        $concert = ConcertFactory::createPublished($this->oldConcertData($user));
         $this->assertTrue($concert->isPublished());
 
         // Act
