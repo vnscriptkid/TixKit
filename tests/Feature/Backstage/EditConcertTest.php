@@ -26,6 +26,7 @@ class EditConcertTest extends TestCase
             'state' => 'New state',
             'zip' => '99999',
             'ticket_price' => '72.50',
+            'ticket_quantity' => 50
         ], $overrides);
     }
 
@@ -107,6 +108,7 @@ class EditConcertTest extends TestCase
             'state' => 'Old state',
             'zip' => '00000',
             'ticket_price' => 2000,
+            'ticket_quantity' => 10
         ]);
         $this->assertFalse($concert->isPublished());
 
@@ -123,6 +125,7 @@ class EditConcertTest extends TestCase
             'state' => 'New state',
             'zip' => '99999',
             'ticket_price' => '72.50',
+            'ticket_quantity' => 50
         ]);
 
         // Assert
@@ -138,6 +141,7 @@ class EditConcertTest extends TestCase
             $this->assertEquals('New state', $concert->state);
             $this->assertEquals('99999', $concert->zip);
             $this->assertEquals(7250, $concert->ticket_price);
+            $this->assertEquals(50, $concert->ticket_quantity);
         });
     }
 
@@ -159,6 +163,7 @@ class EditConcertTest extends TestCase
             'state' => 'Old state',
             'zip' => '00000',
             'ticket_price' => 2000,
+            'ticket_quantity' => 10
         ]);
         $this->assertFalse($concertOfOther->isPublished());
 
@@ -175,6 +180,7 @@ class EditConcertTest extends TestCase
             'state' => 'New state',
             'zip' => '99999',
             'ticket_price' => '72.50',
+            'ticket_quantity' => 50
         ]);
 
         // Assert
@@ -190,6 +196,7 @@ class EditConcertTest extends TestCase
             $this->assertEquals('Old state', $concert->state);
             $this->assertEquals('00000', $concert->zip);
             $this->assertEquals(2000, $concert->ticket_price);
+            $this->assertEquals(10, $concert->ticket_quantity);
         });
     }
 
@@ -208,6 +215,7 @@ class EditConcertTest extends TestCase
             'state' => 'Old state',
             'zip' => '00000',
             'ticket_price' => 2000,
+            'ticket_quantity' => 10,
         ]);
         $this->assertTrue($concert->isPublished());
 
@@ -226,6 +234,7 @@ class EditConcertTest extends TestCase
             $this->assertEquals('Old state', $concert->state);
             $this->assertEquals('00000', $concert->zip);
             $this->assertEquals(2000, $concert->ticket_price);
+            $this->assertEquals(10, $concert->ticket_quantity);
         });
     }
 
@@ -244,6 +253,7 @@ class EditConcertTest extends TestCase
             'state' => 'Old state',
             'zip' => '00000',
             'ticket_price' => 2000,
+            'ticket_quantity' => 10,
         ]);
         $this->assertFalse($concert->isPublished());
 
@@ -261,6 +271,7 @@ class EditConcertTest extends TestCase
             $this->assertEquals('Old state', $concert->state);
             $this->assertEquals('00000', $concert->zip);
             $this->assertEquals(2000, $concert->ticket_price);
+            $this->assertEquals(10, $concert->ticket_quantity);
         });
     }
 
@@ -640,6 +651,81 @@ class EditConcertTest extends TestCase
         $response->assertSessionHasErrors('ticket_price');
         tap($concert->fresh(), function ($concert) {
             $this->assertEquals(5250, $concert->ticket_price);
+        });
+    }
+
+    function ticket_quantity_is_required()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'ticket_quantity' => 5,
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'ticket_quantity' => '',
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('ticket_quantity');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals(5, $concert->ticket_quantity);
+        });
+    }
+
+    function test_ticket_quantity_must_be_an_integer()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'ticket_quantity' => 5,
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'ticket_quantity' => 7.8,
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('ticket_quantity');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals(5, $concert->ticket_quantity);
+        });
+    }
+
+    function test_ticket_quantity_must_be_at_least_1()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'ticket_quantity' => 5,
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'ticket_quantity' => 0,
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('ticket_quantity');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals(5, $concert->ticket_quantity);
         });
     }
 }

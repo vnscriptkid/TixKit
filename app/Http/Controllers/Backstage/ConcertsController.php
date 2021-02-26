@@ -27,7 +27,7 @@ class ConcertsController extends Controller
             'state' => ['required'],
             'zip' => ['required'],
             'ticket_price' => ['required', 'numeric', 'min:5'],
-            'ticket_quantity' => ['required', 'numeric', 'min:1'],
+            'ticket_quantity' => ['required', 'numeric', 'min:1', 'integer'],
         ]);
 
         $concert = Concert::create([
@@ -45,6 +45,7 @@ class ConcertsController extends Controller
             'state' => request('state'),
             'zip' => request('zip'),
             'additional_information' => request('additional_information'),
+            'ticket_quantity' => (int) request('ticket_quantity'),
         ])->addTickets(request('ticket_quantity'));
 
         $concert->publish();
@@ -82,6 +83,7 @@ class ConcertsController extends Controller
             'state' => ['required'],
             'zip' => ['required'],
             'ticket_price' => ['required', 'numeric', 'min:5'],
+            'ticket_quantity' => ['required', 'numeric', 'min:1', 'integer'],
         ]);
 
         $concert->update([
@@ -98,6 +100,7 @@ class ConcertsController extends Controller
             'state' => request('state'),
             'zip' => request('zip'),
             'additional_information' => request('additional_information'),
+            'ticket_quantity' => request('ticket_quantity'),
         ]);
 
         return redirect()->route('backstage.concerts.index');

@@ -26,7 +26,7 @@ class AddConcertTest extends TestCase
             'state' => 'ON',
             'zip' => '12345',
             'ticket_price' => '32.50',
-            'ticket_quantity' => '75',
+            'ticket_quantity' => 75,
         ], $overrides);
     }
 
@@ -62,7 +62,7 @@ class AddConcertTest extends TestCase
             'state' => 'ON',
             'zip' => '12345',
             'ticket_price' => '32.50',
-            'ticket_quantity' => '75',
+            'ticket_quantity' => 75,
         ]);
 
         tap(Concert::first(), function ($concert) use ($response, $user) {

@@ -36,6 +36,7 @@ class ConcertFactory extends Factory
             'city' => 'Hanoi',
             'state' => 'North',
             'zip' => '20056',
+            'ticket_quantity' => 50,
             'additional_information' => 'Feel free to contact us by email: example@gmail.com'
         ];
     }
