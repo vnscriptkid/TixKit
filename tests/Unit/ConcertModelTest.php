@@ -50,14 +50,14 @@ class ConcertModelTest extends TestCase
         $this->assertFalse($concerts->contains($unpublishedConcert));
     }
 
-    public function test_add_tickets_and_tickets_remaining()
+    public function test_tickets_remaining()
     {
         // Arrange
-        $concert = Concert::factory()->published()->create();
+        $concert = Concert::factory()->create(['ticket_quantity' => 5]);
         $this->assertEquals($concert->ticketsRemaining(), 0);
 
         // Act
-        $concert->addTickets(5);
+        $concert->publish();
 
         // Assert
         $this->assertEquals($concert->ticketsRemaining(), 5);
@@ -66,7 +66,9 @@ class ConcertModelTest extends TestCase
     public function test_tickets_remaining_does_not_include_purchased_ones()
     {
         // Arrange
-        $concert = Concert::factory()->published()->create()->addTickets(5);
+        $concert = Concert::factory()->create(['ticket_quantity' => 5]);
+        $concert->publish();
+
 
         // Act
         $order = Order::factory()->create();
@@ -79,7 +81,8 @@ class ConcertModelTest extends TestCase
     function test_trying_to_purchase_more_tickets_than_remain_throws_an_exception()
     {
         // Arrange
-        $concert = Concert::factory()->published()->create()->addTickets(5);
+        $concert = Concert::factory()->create(['ticket_quantity' => 5]);
+        $concert->publish();
 
         try {
             // Act
@@ -97,7 +100,8 @@ class ConcertModelTest extends TestCase
     function test_can_not_order_tickets_that_have_already_been_purchased()
     {
         // Arrange
-        $concert = Concert::factory()->published()->create()->addTickets(10);
+        $concert = Concert::factory()->create(['ticket_quantity' => 10]);
+        $concert->publish();
         $order = Order::factory()->create();
         $order->tickets()->saveMany($concert->tickets->take(6));
 
@@ -116,8 +120,8 @@ class ConcertModelTest extends TestCase
 
     public function test_reserving_tickets_for_an_email_before_charging()
     {
-        $concert = Concert::factory()->published()->create();
-        $concert->addTickets(5);
+        $concert = Concert::factory()->create(['ticket_quantity' => 5]);
+        $concert->publish();
 
         $reservation = $concert->reserveTickets('john@gmail.com', 2);
 
@@ -128,8 +132,8 @@ class ConcertModelTest extends TestCase
 
     public function test_can_not_reserve_tickets_that_has_already_been_purchased()
     {
-        $concert = Concert::factory()->published()->create();
-        $concert->addTickets(4);
+        $concert = Concert::factory()->create(['ticket_quantity' => 4]);
+        $concert->publish();
         $concert->reserveTickets('john@gmail.com', 3);
 
         try {
@@ -144,8 +148,8 @@ class ConcertModelTest extends TestCase
 
     public function test_can_not_reserve_tickets_that_has_already_been_reserved()
     {
-        $concert = Concert::factory()->published()->create();
-        $concert->addTickets(4);
+        $concert = Concert::factory()->create(['ticket_quantity' => 4]);
+        $concert->publish();
         $concert->reserveTickets('john@gmail.com', 3);
 
         try {

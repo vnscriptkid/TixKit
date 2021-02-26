@@ -58,7 +58,11 @@ class PurchaseTicketTest extends TestCase
     {
         $this->withoutExceptionHandling();
         // Arrange
-        $concert = Concert::factory()->published()->create(['ticket_price' => 3740])->addTickets(3);
+        $concert = Concert::factory()->create([
+            'ticket_price' => 3740,
+            'ticket_quantity' => 3
+        ]);
+        $concert->publish();
 
         OrderConfirmationNumber::shouldReceive('generate')->andReturn('NUMBER123');
         TicketCode::shouldReceive('generateFor')->andReturn('CODE1', 'CODE2', 'CODE3');
@@ -95,7 +99,8 @@ class PurchaseTicketTest extends TestCase
     public function email_is_required_to_purchase_tickets()
     {
         // Arrange
-        $concert = Concert::factory()->published()->create()->addTickets(3);
+        $concert = Concert::factory(['ticket_quantity' => 3])->create();
+        $concert->publish();
 
         // Act
         $this->orderTickets($concert, [
@@ -110,7 +115,8 @@ class PurchaseTicketTest extends TestCase
     function test_email_must_be_valid_to_purchase_tickets()
     {
         // Arrange
-        $concert = Concert::factory()->published()->create()->addTickets(3);
+        $concert = Concert::factory(['ticket_quantity' => 3])->create();
+        $concert->publish();
 
         // Act
         $this->orderTickets($concert, [
@@ -126,7 +132,8 @@ class PurchaseTicketTest extends TestCase
     function test_ticket_quantity_is_required_to_purchase_tickets()
     {
         // Arrange
-        $concert = Concert::factory()->published()->create()->addTickets(3);
+        $concert = Concert::factory(['ticket_quantity' => 3])->create();
+        $concert->publish();
 
         // Act
         $this->orderTickets($concert, [
@@ -141,7 +148,8 @@ class PurchaseTicketTest extends TestCase
     function test_ticket_quantity_must_be_at_least_1_to_purchase_tickets()
     {
         // Arrange
-        $concert = Concert::factory()->published()->create()->addTickets(3);
+        $concert = Concert::factory(['ticket_quantity' => 3])->create();
+        $concert->publish();
 
         // Act
         $this->orderTickets($concert, [
@@ -157,7 +165,8 @@ class PurchaseTicketTest extends TestCase
     function test_payment_token_is_required()
     {
         // Arrange
-        $concert = Concert::factory()->published()->create()->addTickets(3);
+        $concert = Concert::factory(['ticket_quantity' => 3])->create();
+        $concert->publish();
 
         // Act
         $this->orderTickets($concert, [
@@ -172,7 +181,8 @@ class PurchaseTicketTest extends TestCase
     function test_an_order_is_not_created_if_payment_fails()
     {
         // Arrange
-        $concert = Concert::factory()->published()->create()->addTickets(3);
+        $concert = Concert::factory(['ticket_quantity' => 3])->create();
+        $concert->publish();
 
         // Act
         $this->orderTickets($concert, [
@@ -191,7 +201,7 @@ class PurchaseTicketTest extends TestCase
     public function test_cannot_purchase_tickets_to_an_unpublished_concert()
     {
         // Arrange
-        $concert = Concert::factory()->unpublished()->create()->addTickets(3);
+        $concert = Concert::factory()->unpublished()->create(['ticket_quantity' => 3]);
 
         // Act
         $this->orderTickets($concert, [
@@ -209,7 +219,8 @@ class PurchaseTicketTest extends TestCase
     public function test_cannot_purchase_more_tickets_than_remain()
     {
         // Arrange
-        $concert = Concert::factory()->published()->create()->addTickets(50);
+        $concert = Concert::factory(['ticket_quantity' => 50])->create();
+        $concert->publish();
 
         // Act
         $this->orderTickets($concert, [
@@ -227,9 +238,9 @@ class PurchaseTicketTest extends TestCase
 
     public function test_2_users_trying_to_compete_the_same_tickets()
     {
-        $this->withoutExceptionHandling();
         // Arrange
-        $concert = Concert::factory()->published()->create(['ticket_price' => 1000])->addTickets(2);
+        $concert = Concert::factory(['ticket_quantity' => 2, 'ticket_price' => 1000])->create();
+        $concert->publish();
 
         $this->paymentGateway->beforeFirstCharge(function () use ($concert) {
             // userB start competing

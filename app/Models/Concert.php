@@ -58,9 +58,9 @@ class Concert extends Model
         return $this->tickets()->available()->count();
     }
 
-    public function addTickets($numberOfTickets) // refator: addTickets()
+    private function addTickets()
     {
-        foreach (range(1, $numberOfTickets) as $i) {
+        foreach (range(1, $this->ticket_quantity) as $i) {
             $this->tickets()->create([]);
         }
         return $this;
@@ -99,6 +99,6 @@ class Concert extends Model
     {
         $this->update(['published_at' => $this->freshTimestamp()]);
 
-        $this->addTickets($this->ticket_quantity);
+        $this->addTickets();
     }
 }

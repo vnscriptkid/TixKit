@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
-        Concert::factory()->published()->create([
+        $concert = Concert::factory()->create([
             'title' => 'Example Title',
             'subtitle' => 'with some fake subTitles',
             'date' => Carbon::parse('+2 weeks'),
@@ -27,8 +27,10 @@ class DatabaseSeeder extends Seeder
             'city' => 'Hanoi',
             'state' => 'North',
             'zip' => '20056',
-            'additional_information' => 'Feel free to contact us by email: example@gmail.com'
-        ])->addTickets(5);
+            'additional_information' => 'Feel free to contact us by email: example@gmail.com',
+            'ticket_quantity' => 5
+        ]);
+        $concert->publish();
 
         User::factory()->create([
             'email' => 'vnscriptkid@gmail.com',
