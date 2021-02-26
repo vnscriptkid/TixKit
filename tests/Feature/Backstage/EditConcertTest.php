@@ -4,13 +4,30 @@ namespace Tests\Feature\Backstage;
 
 use App\Models\Concert;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class EditConcertTest extends TestCase
 {
     use RefreshDatabase;
+
+    private function validParams($overrides = [])
+    {
+        return array_merge([
+            'title' => 'New title',
+            'subtitle' => 'New subtitle',
+            'additional_information' => 'New additional information',
+            'date' => '2018-12-12',
+            'time' => '8:00pm',
+            'venue' => 'New venue',
+            'venue_address' => 'New address',
+            'city' => 'New city',
+            'state' => 'New state',
+            'zip' => '99999',
+            'ticket_price' => '72.50',
+        ], $overrides);
+    }
 
     public function test_promoters_can_view_the_edit_form_for_their_own_unpublished_concerts()
     {
@@ -72,5 +89,557 @@ class EditConcertTest extends TestCase
 
         $response->assertStatus(302);
         $response->assertRedirect('/login');
+    }
+
+    function test_promoters_can_edit_their_own_unpublished_concerts()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->create([
+            'user_id' => $user->id,
+            'title' => 'Old title',
+            'subtitle' => 'Old subtitle',
+            'additional_information' => 'Old additional information',
+            'date' => Carbon::parse('2017-01-01 5:00pm'),
+            'venue' => 'Old venue',
+            'venue_address' => 'Old address',
+            'city' => 'Old city',
+            'state' => 'Old state',
+            'zip' => '00000',
+            'ticket_price' => 2000,
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)->patch("/backstage/concerts/{$concert->id}", [
+            'title' => 'New title',
+            'subtitle' => 'New subtitle',
+            'additional_information' => 'New additional information',
+            'date' => '2018-12-12',
+            'time' => '8:00pm',
+            'venue' => 'New venue',
+            'venue_address' => 'New address',
+            'city' => 'New city',
+            'state' => 'New state',
+            'zip' => '99999',
+            'ticket_price' => '72.50',
+        ]);
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts");
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals('New title', $concert->title);
+            $this->assertEquals('New subtitle', $concert->subtitle);
+            $this->assertEquals('New additional information', $concert->additional_information);
+            $this->assertEquals(Carbon::parse('2018-12-12 8:00pm'), $concert->date);
+            $this->assertEquals('New venue', $concert->venue);
+            $this->assertEquals('New address', $concert->venue_address);
+            $this->assertEquals('New city', $concert->city);
+            $this->assertEquals('New state', $concert->state);
+            $this->assertEquals('99999', $concert->zip);
+            $this->assertEquals(7250, $concert->ticket_price);
+        });
+    }
+
+    function test_promoters_can_not_edit_unpublished_concert_of_other()
+    {
+        // Arrange
+        $me = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        $concertOfOther = Concert::factory()->create([
+            'user_id' => $otherUser->id,
+            'title' => 'Old title',
+            'subtitle' => 'Old subtitle',
+            'additional_information' => 'Old additional information',
+            'date' => Carbon::parse('2017-01-01 5:00pm'),
+            'venue' => 'Old venue',
+            'venue_address' => 'Old address',
+            'city' => 'Old city',
+            'state' => 'Old state',
+            'zip' => '00000',
+            'ticket_price' => 2000,
+        ]);
+        $this->assertFalse($concertOfOther->isPublished());
+
+        // Act
+        $response = $this->actingAs($me)->patch("/backstage/concerts/{$concertOfOther->id}", [
+            'title' => 'New title',
+            'subtitle' => 'New subtitle',
+            'additional_information' => 'New additional information',
+            'date' => '2018-12-12',
+            'time' => '8:00pm',
+            'venue' => 'New venue',
+            'venue_address' => 'New address',
+            'city' => 'New city',
+            'state' => 'New state',
+            'zip' => '99999',
+            'ticket_price' => '72.50',
+        ]);
+
+        // Assert
+        $response->assertStatus(404);
+        tap($concertOfOther->fresh(), function ($concert) {
+            $this->assertEquals('Old title', $concert->title);
+            $this->assertEquals('Old subtitle', $concert->subtitle);
+            $this->assertEquals('Old additional information', $concert->additional_information);
+            $this->assertEquals(Carbon::parse('2017-01-01 5:00pm'), $concert->date);
+            $this->assertEquals('Old venue', $concert->venue);
+            $this->assertEquals('Old address', $concert->venue_address);
+            $this->assertEquals('Old city', $concert->city);
+            $this->assertEquals('Old state', $concert->state);
+            $this->assertEquals('00000', $concert->zip);
+            $this->assertEquals(2000, $concert->ticket_price);
+        });
+    }
+
+    function test_promoters_cannot_edit_published_concerts()
+    {
+        $user = User::factory()->create();
+        $concert = Concert::factory()->published()->create([
+            'user_id' => $user->id,
+            'title' => 'Old title',
+            'subtitle' => 'Old subtitle',
+            'additional_information' => 'Old additional information',
+            'date' => Carbon::parse('2017-01-01 5:00pm'),
+            'venue' => 'Old venue',
+            'venue_address' => 'Old address',
+            'city' => 'Old city',
+            'state' => 'Old state',
+            'zip' => '00000',
+            'ticket_price' => 2000,
+        ]);
+        $this->assertTrue($concert->isPublished());
+
+        $response = $this->actingAs($user)->patch("/backstage/concerts/{$concert->id}", $this->validParams());
+
+        $response->assertStatus(403);
+
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals('Old title', $concert->title);
+            $this->assertEquals('Old subtitle', $concert->subtitle);
+            $this->assertEquals('Old additional information', $concert->additional_information);
+            $this->assertEquals(Carbon::parse('2017-01-01 5:00pm'), $concert->date);
+            $this->assertEquals('Old venue', $concert->venue);
+            $this->assertEquals('Old address', $concert->venue_address);
+            $this->assertEquals('Old city', $concert->city);
+            $this->assertEquals('Old state', $concert->state);
+            $this->assertEquals('00000', $concert->zip);
+            $this->assertEquals(2000, $concert->ticket_price);
+        });
+    }
+
+    function test_guests_cannot_edit_concerts()
+    {
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'title' => 'Old title',
+            'subtitle' => 'Old subtitle',
+            'additional_information' => 'Old additional information',
+            'date' => Carbon::parse('2017-01-01 5:00pm'),
+            'venue' => 'Old venue',
+            'venue_address' => 'Old address',
+            'city' => 'Old city',
+            'state' => 'Old state',
+            'zip' => '00000',
+            'ticket_price' => 2000,
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        $response = $this->patch("/backstage/concerts/{$concert->id}", $this->validParams());
+
+        $response->assertRedirect('/login');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals('Old title', $concert->title);
+            $this->assertEquals('Old subtitle', $concert->subtitle);
+            $this->assertEquals('Old additional information', $concert->additional_information);
+            $this->assertEquals(Carbon::parse('2017-01-01 5:00pm'), $concert->date);
+            $this->assertEquals('Old venue', $concert->venue);
+            $this->assertEquals('Old address', $concert->venue_address);
+            $this->assertEquals('Old city', $concert->city);
+            $this->assertEquals('Old state', $concert->state);
+            $this->assertEquals('00000', $concert->zip);
+            $this->assertEquals(2000, $concert->ticket_price);
+        });
+    }
+
+    function test_title_is_required()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'title' => 'Old title',
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'title' => '',
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('title');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals('Old title', $concert->title);
+        });
+    }
+
+    function test_subtitle_is_optional()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'subtitle' => 'Old subtitle',
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'subtitle' => '',
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts");
+        tap($concert->fresh(), function ($concert) {
+            $this->assertNull($concert->subtitle);
+        });
+    }
+
+    function test_additional_information_is_optional()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'additional_information' => 'Old additional information',
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'additional_information' => '',
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts");
+        tap($concert->fresh(), function ($concert) {
+            $this->assertNull($concert->additional_information);
+        });
+    }
+
+    function test_date_is_required()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'date' => Carbon::parse('2018-01-01 8:00pm'),
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'date' => '',
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('date');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals(Carbon::parse('2018-01-01 8:00pm'), $concert->date);
+        });
+    }
+
+    function test_date_must_be_a_valid_date()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'date' => Carbon::parse('2018-01-01 8:00pm'),
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'date' => 'not a date',
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('date');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals(Carbon::parse('2018-01-01 8:00pm'), $concert->date);
+        });
+    }
+
+    function test_time_is_required()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'date' => Carbon::parse('2018-01-01 8:00pm'),
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'date' => 'not a date',
+            ]));
+
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'time' => '',
+            ]));
+
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('time');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals(Carbon::parse('2018-01-01 8:00pm'), $concert->date);
+        });
+    }
+
+    function test_time_must_be_a_valid_time()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'date' => Carbon::parse('2018-01-01 8:00pm'),
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'time' => 'not a time',
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('time');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals(Carbon::parse('2018-01-01 8:00pm'), $concert->date);
+        });
+    }
+
+    function test_venue_is_required()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'venue' => 'Old venue',
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'venue' => '',
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('venue');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals('Old venue', $concert->venue);
+        });
+    }
+
+    function test_venue_address_is_required()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'venue_address' => 'Old address',
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'venue_address' => '',
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('venue_address');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals('Old address', $concert->venue_address);
+        });
+    }
+
+    function test_city_is_required()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'city' => 'Old city',
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'city' => '',
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('city');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals('Old city', $concert->city);
+        });
+    }
+
+    function test_state_is_required()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'state' => 'Old state',
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'state' => '',
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('state');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals('Old state', $concert->state);
+        });
+    }
+
+    function test_zip_is_required()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'zip' => 'Old zip',
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'zip' => '',
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('zip');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals('Old zip', $concert->zip);
+        });
+    }
+
+    /** @test */
+    function ticket_price_is_required()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'ticket_price' => 5250,
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'ticket_price' => '',
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('ticket_price');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals(5250, $concert->ticket_price);
+        });
+    }
+
+    function test_ticket_price_must_be_numeric()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'ticket_price' => 5250,
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'ticket_price' => 'is not numeric',
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('ticket_price');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals(5250, $concert->ticket_price);
+        });
+    }
+
+    function test_ticket_price_must_be_at_least_5()
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $concert = Concert::factory()->unpublished()->create([
+            'user_id' => $user->id,
+            'ticket_price' => 5250,
+        ]);
+        $this->assertFalse($concert->isPublished());
+
+        // Act
+        $response = $this->actingAs($user)
+            ->from("/backstage/concerts/{$concert->id}/edit")
+            ->patch("/backstage/concerts/{$concert->id}", $this->validParams([
+                'ticket_price' => 4,
+            ]));
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/edit");
+        $response->assertSessionHasErrors('ticket_price');
+        tap($concert->fresh(), function ($concert) {
+            $this->assertEquals(5250, $concert->ticket_price);
+        });
     }
 }

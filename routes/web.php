@@ -33,6 +33,7 @@ Route::get('/login', [LoginController::class, 'showLoginForm']);
 Route::middleware(['auth'])->prefix('backstage')->group(function () {
     Route::get('/concerts/new', [BackstageConcertsController::class, 'create'])->name('backstage.concerts.new');
     Route::get('/concerts/{id}/edit', [BackstageConcertsController::class, 'edit'])->name('backstage.concerts.edit');
+    Route::patch('/concerts/{id}', [BackstageConcertsController::class, 'update'])->name('backstage.concerts.update');
     Route::post('/concerts', [BackstageConcertsController::class, 'store']);
-    Route::get('/concerts', [BackstageConcertsController::class, 'index']);
+    Route::get('/concerts', [BackstageConcertsController::class, 'index'])->name('backstage.concerts.index');
 });
