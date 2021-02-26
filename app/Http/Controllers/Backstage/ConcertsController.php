@@ -46,7 +46,7 @@ class ConcertsController extends Controller
             'zip' => request('zip'),
             'additional_information' => request('additional_information'),
             'ticket_quantity' => (int) request('ticket_quantity'),
-        ])->addTickets(request('ticket_quantity'));
+        ]);
 
         $concert->publish();
 
