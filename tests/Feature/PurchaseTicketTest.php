@@ -10,6 +10,7 @@ use App\Billing\PaymentGateway;
 use App\Facades\OrderConfirmationNumber;
 use App\Facades\TicketCode;
 use App\Mail\OrderConfirmationEmail;
+use Database\Factories\ConcertFactory;
 use Illuminate\Support\Facades\Mail;
 
 class PurchaseTicketTest extends TestCase
@@ -201,7 +202,7 @@ class PurchaseTicketTest extends TestCase
     public function test_cannot_purchase_tickets_to_an_unpublished_concert()
     {
         // Arrange
-        $concert = Concert::factory()->unpublished()->create(['ticket_quantity' => 3]);
+        $concert = ConcertFactory::createUnpublished(['ticket_quantity' => 3]);
 
         // Act
         $this->orderTickets($concert, [

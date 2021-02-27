@@ -59,11 +59,11 @@ class ViewConcertList extends TestCase
         $me = User::factory()->create();
         $otherUser = User::factory()->create();
 
-        $concertA = Concert::factory()->unpublished()->create(['user_id' => $me->id]);
-        $concertB = Concert::factory()->create(['user_id' => $otherUser->id]);
+        $concertA = ConcertFactory::createUnpublished(['user_id' => $me->id]);
+        $concertB = ConcertFactory::createUnpublished(['user_id' => $otherUser->id]);
         $concertC = ConcertFactory::createPublished(['user_id' => $otherUser->id]);
         $concertD = ConcertFactory::createPublished(['user_id' => $me->id]);
-        $concertE = Concert::factory()->unpublished()->create(['user_id' => $me->id]);
+        $concertE = ConcertFactory::createUnpublished(['user_id' => $me->id]);
 
         // Act
         $response = $this->actingAs($me)->get('/backstage/concerts');

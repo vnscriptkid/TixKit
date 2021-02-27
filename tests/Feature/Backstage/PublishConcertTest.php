@@ -16,7 +16,7 @@ class PublishConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'ticket_quantity' => 10,
             'user_id' => $user->id
         ]);
@@ -39,7 +39,7 @@ class PublishConcertTest extends TestCase
         // Arrange
         $me = User::factory()->create();
         $otherUser = User::factory()->create();
-        $concertOfOther = Concert::factory()->unpublished()->create([
+        $concertOfOther = ConcertFactory::createUnpublished([
             'ticket_quantity' => 10,
             'user_id' => $otherUser->id
         ]);
@@ -106,7 +106,7 @@ class PublishConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'ticket_quantity' => 10,
             'user_id' => $user->id
         ]);
@@ -141,7 +141,7 @@ class PublishConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'ticket_quantity' => 10,
             'user_id' => $user->id
         ]);

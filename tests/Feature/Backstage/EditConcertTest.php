@@ -65,7 +65,7 @@ class EditConcertTest extends TestCase
     public function test_promoters_can_view_the_edit_form_for_their_own_unpublished_concerts()
     {
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create(['user_id' => $user->id]);
+        $concert = ConcertFactory::createUnpublished(['user_id' => $user->id]);
         $this->assertFalse($concert->isPublished());
 
         $response = $this->actingAs($user)->get("/backstage/concerts/{$concert->id}/edit");
@@ -227,7 +227,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create($this->oldConcertData($user));
+        $concert = ConcertFactory::createUnpublished($this->oldConcertData($user));
         $this->assertFalse($concert->isPublished());
 
         // Act
@@ -242,7 +242,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'title' => 'Old title',
         ]);
@@ -267,7 +267,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'subtitle' => 'Old subtitle',
         ]);
@@ -291,7 +291,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'additional_information' => 'Old additional information',
         ]);
@@ -315,7 +315,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'date' => Carbon::parse('2018-01-01 8:00pm'),
         ]);
@@ -340,7 +340,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'date' => Carbon::parse('2018-01-01 8:00pm'),
         ]);
@@ -365,7 +365,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'date' => Carbon::parse('2018-01-01 8:00pm'),
         ]);
@@ -395,7 +395,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'date' => Carbon::parse('2018-01-01 8:00pm'),
         ]);
@@ -420,7 +420,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'venue' => 'Old venue',
         ]);
@@ -445,7 +445,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'venue_address' => 'Old address',
         ]);
@@ -470,7 +470,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'city' => 'Old city',
         ]);
@@ -495,7 +495,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'state' => 'Old state',
         ]);
@@ -520,7 +520,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'zip' => 'Old zip',
         ]);
@@ -546,7 +546,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'ticket_price' => 5250,
         ]);
@@ -571,7 +571,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'ticket_price' => 5250,
         ]);
@@ -596,7 +596,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'ticket_price' => 5250,
         ]);
@@ -621,7 +621,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'ticket_quantity' => 5,
         ]);
@@ -646,7 +646,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'ticket_quantity' => 5,
         ]);
@@ -671,7 +671,7 @@ class EditConcertTest extends TestCase
     {
         // Arrange
         $user = User::factory()->create();
-        $concert = Concert::factory()->unpublished()->create([
+        $concert = ConcertFactory::createUnpublished([
             'user_id' => $user->id,
             'ticket_quantity' => 5,
         ]);

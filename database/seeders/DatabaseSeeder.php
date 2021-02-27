@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
             'user_id' => $user->id
         ]);
 
-        Concert::factory()->unpublished()->create([
+        ConcertFactory::createUnpublished([
             'title' => 'The Olympic Games',
             'subtitle' => 'So much fun',
             'date' => Carbon::parse('+2 weeks'),

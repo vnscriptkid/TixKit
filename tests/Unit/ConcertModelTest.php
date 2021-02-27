@@ -40,7 +40,7 @@ class ConcertModelTest extends TestCase
         // Arrange
         $publishedConcert1 = ConcertFactory::createPublished();
         $publishedConcert2 = ConcertFactory::createPublished();
-        $unpublishedConcert = Concert::factory()->unpublished()->create();
+        $unpublishedConcert = ConcertFactory::createUnpublished();
 
         // Act
         $concerts = Concert::published()->get();
