@@ -36,6 +36,13 @@ class ViewConcertList extends TestCase
                 "Failed asserting that the collection did not contain the specified value."
             );
         });
+
+        Collection::macro('assertContainsExactly', function ($arr) {
+            Assert::assertEquals(count($arr), $this->count(), "Size does not match.");
+            foreach ($arr as $item) {
+                Assert::assertTrue($this->contains($item), 'Collection does not contain this item.');
+            }
+        });
     }
 
     public function test_guests_can_not_view_promoters_concert_list()
@@ -64,10 +71,8 @@ class ViewConcertList extends TestCase
         // Assert
         $response->assertStatus(200);
 
-        $this->assertCount(1, $response->viewData('publishedConcerts'));
-        $this->assertCount(2, $response->viewData('unpublishedConcerts'));
-        $response->viewData('publishedConcerts')->assertContains($concertD);
-        $response->viewData('unpublishedConcerts')->assertContains($concertA);
-        $response->viewData('unpublishedConcerts')->assertContains($concertE);
+        $response->viewData('unpublishedConcerts')->assertContainsExactly([$concertA, $concertE]);
+
+        $response->viewData('publishedConcerts')->assertContainsExactly([$concertD]);
     }
 }
