@@ -4,6 +4,7 @@ namespace Tests\Feature\Backstage;
 
 use App\Models\Concert;
 use App\Models\User;
+use Database\Factories\ConcertFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
@@ -51,11 +52,11 @@ class ViewConcertList extends TestCase
         $me = User::factory()->create();
         $otherUser = User::factory()->create();
 
-        $concertA = Concert::factory()->create(['user_id' => $me->id]);
+        $concertA = Concert::factory()->unpublished()->create(['user_id' => $me->id]);
         $concertB = Concert::factory()->create(['user_id' => $otherUser->id]);
-        $concertC = Concert::factory()->create(['user_id' => $otherUser->id]);
-        $concertD = Concert::factory()->create(['user_id' => $me->id]);
-        $concertE = Concert::factory()->create(['user_id' => $me->id]);
+        $concertC = ConcertFactory::createPublished(['user_id' => $otherUser->id]);
+        $concertD = ConcertFactory::createPublished(['user_id' => $me->id]);
+        $concertE = Concert::factory()->unpublished()->create(['user_id' => $me->id]);
 
         // Act
         $response = $this->actingAs($me)->get('/backstage/concerts');
@@ -63,11 +64,10 @@ class ViewConcertList extends TestCase
         // Assert
         $response->assertStatus(200);
 
-        $response->viewData('concerts')->assertContains($concertA);
-        $response->viewData('concerts')->assertContains($concertD);
-        $response->viewData('concerts')->assertContains($concertE);
-
-        $response->viewData('concerts')->assertNotContains($concertB);
-        $response->viewData('concerts')->assertNotContains($concertC);
+        $this->assertCount(1, $response->viewData('publishedConcerts'));
+        $this->assertCount(2, $response->viewData('unpublishedConcerts'));
+        $response->viewData('publishedConcerts')->assertContains($concertD);
+        $response->viewData('unpublishedConcerts')->assertContains($concertA);
+        $response->viewData('unpublishedConcerts')->assertContains($concertE);
     }
 }
