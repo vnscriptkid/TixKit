@@ -5,6 +5,7 @@ use App\Http\Controllers\ConcertOrdersController;
 use App\Http\Controllers\ConcertsController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\PublishedConcertsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -36,4 +37,5 @@ Route::middleware(['auth'])->prefix('backstage')->group(function () {
     Route::patch('/concerts/{id}', [BackstageConcertsController::class, 'update'])->name('backstage.concerts.update');
     Route::post('/concerts', [BackstageConcertsController::class, 'store']);
     Route::get('/concerts', [BackstageConcertsController::class, 'index'])->name('backstage.concerts.index');
+    Route::post('/published-concerts', [PublishedConcertsController::class, 'store']);
 });
