@@ -17,6 +17,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $user = User::factory()->create([
+            'email' => 'vnscriptkid@gmail.com',
+            'password' => bcrypt('123456')
+        ]);
+
         ConcertFactory::createPublished([
             'title' => 'Example Title',
             'subtitle' => 'with some fake subTitles',
@@ -28,12 +33,23 @@ class DatabaseSeeder extends Seeder
             'state' => 'North',
             'zip' => '20056',
             'additional_information' => 'Feel free to contact us by email: example@gmail.com',
-            'ticket_quantity' => 5
+            'ticket_quantity' => 5,
+            'user_id' => $user->id
         ]);
 
-        User::factory()->create([
-            'email' => 'vnscriptkid@gmail.com',
-            'password' => bcrypt('123456')
+        Concert::factory()->unpublished()->create([
+            'title' => 'The Olympic Games',
+            'subtitle' => 'So much fun',
+            'date' => Carbon::parse('+2 weeks'),
+            'ticket_price' => 3450,
+            'venue' => 'The Stadium',
+            'venue_address' => 'Lieu Giai Street',
+            'city' => 'HCM',
+            'state' => 'South',
+            'zip' => '30044',
+            'additional_information' => 'Feel free to contact us by email: example@gmail.com',
+            'ticket_quantity' => 200,
+            'user_id' => $user->id
         ]);
     }
 }
