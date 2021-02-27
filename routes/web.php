@@ -28,7 +28,7 @@ Route::post('/concerts/{id}/orders', [ConcertOrdersController::class, 'store']);
 Route::get('/orders/{confirmation_number}', [OrdersController::class, 'show']);
 
 Route::post('/login', [LoginController::class, 'login'])->name('login');
-Route::post('/logout', [LoginController::class, 'logout']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/login', [LoginController::class, 'showLoginForm']);
 
 Route::middleware(['auth'])->prefix('backstage')->group(function () {
@@ -37,5 +37,5 @@ Route::middleware(['auth'])->prefix('backstage')->group(function () {
     Route::patch('/concerts/{id}', [BackstageConcertsController::class, 'update'])->name('backstage.concerts.update');
     Route::post('/concerts', [BackstageConcertsController::class, 'store']);
     Route::get('/concerts', [BackstageConcertsController::class, 'index'])->name('backstage.concerts.index');
-    Route::post('/published-concerts', [PublishedConcertsController::class, 'store']);
+    Route::post('/published-concerts', [PublishedConcertsController::class, 'store'])->name('backstage.published-concerts.store');
 });
