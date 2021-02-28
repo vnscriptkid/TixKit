@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Facades\OrderConfirmationNumber;
 use App\Models\Concert;
 use App\Models\Order;
+use App\Models\Ticket;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class OrderFactory extends Factory
@@ -32,5 +33,15 @@ class OrderFactory extends Factory
                 return Concert::factory()->create()->id;
             }
         ];
+    }
+
+    public static function createForConcert(Concert $concert, $overrides = [], $ticketQuantity = 1)
+    {
+        $order = Order::factory()->create($overrides);
+        $tickets = Ticket::factory($ticketQuantity)->create([
+            'concert_id' => $concert->id
+        ]);
+        $order->tickets()->saveMany($tickets);
+        return $order;
     }
 }

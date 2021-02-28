@@ -11,8 +11,11 @@ class PublishedConcertOrdersController extends Controller
     {
         $concert = Auth::user()->concerts()->published()->findOrFail($id);
 
+        $orders = $concert->orders()->latest()->take(10)->get();
+
         return view('backstage.published-concert-orders.index', [
-            'concert' => $concert
+            'concert' => $concert,
+            'orders' => $orders
         ]);
     }
 }
