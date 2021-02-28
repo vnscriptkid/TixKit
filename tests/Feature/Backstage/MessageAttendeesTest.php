@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Backstage;
 
+use App\Jobs\SendAttendeeMessage;
 use App\Models\AttendeeMessage;
 use App\Models\User;
 use Database\Factories\ConcertFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class MessageAttendeesTest extends TestCase
@@ -48,12 +50,12 @@ class MessageAttendeesTest extends TestCase
 
     function test_a_promoter_can_send_a_new_message()
     {
-        $this->withoutExceptionHandling();
         // Arrange
         $user = User::factory()->create();
         $concert = ConcertFactory::createPublished([
             'user_id' => $user->id,
         ]);
+        Queue::fake();
 
         // Act
         $response = $this->actingAs($user)->post("/backstage/concerts/{$concert->id}/messages", [
@@ -69,5 +71,30 @@ class MessageAttendeesTest extends TestCase
         $this->assertEquals($concert->id, $message->concert_id);
         $this->assertEquals('My subject', $message->subject);
         $this->assertEquals('My message', $message->message);
+        Queue::assertPushed(SendAttendeeMessage::class, function ($job) use ($message) {
+            return $message->is($job->attendeeMessage);
+        });
+    }
+
+    function test_a_promoter_cannot_send_a_new_message_for_other_concerts()
+    {
+        // Arrange
+        Queue::fake();
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $concertOfOther = ConcertFactory::createPublished([
+            'user_id' => $otherUser->id,
+        ]);
+
+        // Act
+        $response = $this->actingAs($user)->post("/backstage/concerts/{$concertOfOther->id}/messages", [
+            'subject' => 'My subject',
+            'message' => 'My message',
+        ]);
+
+        // Assert
+        $response->assertStatus(404);
+        $this->assertEquals(0, AttendeeMessage::count());
+        Queue::assertNotPushed(SendAttendeeMessage::class);
     }
 }
