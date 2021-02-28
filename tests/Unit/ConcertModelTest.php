@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use App\Exceptions\NotEnoughTicketsException;
 use App\Models\Concert;
 use App\Models\Order;
+use App\Models\Ticket;
 use Carbon\Carbon;
 use Database\Factories\ConcertFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -200,5 +201,16 @@ class ConcertModelTest extends TestCase
         $order->tickets()->saveMany($concert->tickets->take(2));
 
         $this->assertEquals(28.57, $concert->percentSoldOut());
+    }
+
+    public function test_revenue_in_dollars()
+    {
+        $concert = Concert::factory()->create();
+        $orderA = Order::factory()->create(['concert_id' => $concert->id, 'amount' => 1234]);
+        $orderB = Order::factory()->create(['concert_id' => $concert->id, 'amount' => 2380]);
+        $concert->tickets()->saveMany(Ticket::factory(2)->create(['order_id' => $orderA]));
+        $concert->tickets()->saveMany(Ticket::factory(5)->create(['order_id' => $orderB]));
+
+        $this->assertEquals(36.14, $concert->revenueInDollars());
     }
 }
