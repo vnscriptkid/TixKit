@@ -18,7 +18,21 @@ class ViewPublishedConcertOrdersTest extends TestCase
 
     function test_a_promoter_can_view_the_orders_of_their_own_published_concert()
     {
-        $this->withoutExceptionHandling();
+        // Arrange
+        $user = User::factory()->create();
+        $concert = ConcertFactory::createPublished(['user_id' => $user->id]);
+
+        // Act
+        $response = $this->actingAs($user)->get("/backstage/published-concerts/{$concert->id}/orders");
+
+        // Assert
+        $response->assertStatus(200);
+        $response->assertViewIs('backstage.published-concert-orders.index');
+        $this->assertTrue($response->viewData('concert')->is($concert));
+    }
+
+    function test_a_promoter_can_view_10_most_recent_orders_of_the_concert()
+    {
         // Arrange
         $user = User::factory()->create();
         $concert = ConcertFactory::createPublished(['user_id' => $user->id]);
@@ -39,10 +53,6 @@ class ViewPublishedConcertOrdersTest extends TestCase
         $response = $this->actingAs($user)->get("/backstage/published-concerts/{$concert->id}/orders");
 
         // Assert
-        $response->assertStatus(200);
-        $response->assertViewIs('backstage.published-concert-orders.index');
-        $this->assertTrue($response->viewData('concert')->is($concert));
-
         $response->viewData('orders')->assertTheSame([$order1, $order2, $order3, $order4, $order5, $order6, $order7, $order8, $order9, $order10]);
     }
 
