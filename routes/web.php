@@ -5,6 +5,7 @@ use App\Http\Controllers\ConcertOrdersController;
 use App\Http\Controllers\ConcertsController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\PublishedConcertOrdersController;
 use App\Http\Controllers\PublishedConcertsController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,4 +39,6 @@ Route::middleware(['auth'])->prefix('backstage')->group(function () {
     Route::post('/concerts', [BackstageConcertsController::class, 'store']);
     Route::get('/concerts', [BackstageConcertsController::class, 'index'])->name('backstage.concerts.index');
     Route::post('/published-concerts', [PublishedConcertsController::class, 'store'])->name('backstage.published-concerts.store');
+    Route::get('/published-concerts/{id}/orders', [PublishedConcertOrdersController::class, 'index'])
+        ->name('backstage.published-concert-orders.index');
 });
