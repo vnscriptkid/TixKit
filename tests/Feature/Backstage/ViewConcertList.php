@@ -7,7 +7,6 @@ use App\Models\User;
 use Database\Factories\ConcertFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Assert;
 use Tests\TestCase;
 
@@ -18,24 +17,6 @@ class ViewConcertList extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        TestResponse::macro('viewData', function ($key) {
-            return $this->original->getData()[$key];
-        });
-
-        Collection::macro('assertContains', function ($value) {
-            Assert::assertTrue(
-                $this->contains($value),
-                "Failed asserting that the collection contained the specified value."
-            );
-        });
-
-        Collection::macro('assertNotContains', function ($value) {
-            Assert::assertFalse(
-                $this->contains($value),
-                "Failed asserting that the collection did not contain the specified value."
-            );
-        });
 
         Collection::macro('assertContainsExactly', function ($arr) {
             Assert::assertEquals(count($arr), $this->count(), "Size does not match.");
