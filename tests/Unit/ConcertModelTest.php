@@ -67,16 +67,23 @@ class ConcertModelTest extends TestCase
     public function test_tickets_remaining_does_not_include_purchased_ones()
     {
         // Arrange
-        $concert = Concert::factory()->create(['ticket_quantity' => 5]);
-        $concert->publish();
-
-
-        // Act
+        $concert = ConcertFactory::createPublished(['ticket_quantity' => 5]);
         $order = Order::factory()->create();
         $order->tickets()->saveMany($concert->tickets->take(2));
 
-        // Assert
+        // Act + Assert
         $this->assertEquals($concert->ticketsRemaining(), 3);
+    }
+
+    public function test_tickets_sold_include_only_tickets_associated_with_an_order()
+    {
+        // Arrange
+        $concert = ConcertFactory::createPublished(['ticket_quantity' => 5]);
+        $order = Order::factory()->create();
+        $order->tickets()->saveMany($concert->tickets->take(2));
+
+        // Act + Assert
+        $this->assertEquals($concert->ticketsSold(), 2);
     }
 
     function test_trying_to_purchase_more_tickets_than_remain_throws_an_exception()
