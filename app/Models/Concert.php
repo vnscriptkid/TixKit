@@ -13,6 +13,11 @@ class Concert extends Model
     protected $guarded = [];
     protected $dates = ['date', 'published_at'];
 
+    public function attendeeMessages()
+    {
+        return $this->hasMany(AttendeeMessage::class);
+    }
+
     public function findTickets($ticketQuantityNeeded)
     {
         $tickets = $this->tickets()->available()->take($ticketQuantityNeeded)->get();

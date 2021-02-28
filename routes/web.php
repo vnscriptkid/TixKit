@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Backstage\ConcertMessagesController;
 use App\Http\Controllers\Backstage\ConcertsController as BackstageConcertsController;
 use App\Http\Controllers\ConcertOrdersController;
 use App\Http\Controllers\ConcertsController;
@@ -41,4 +42,6 @@ Route::middleware(['auth'])->prefix('backstage')->group(function () {
     Route::post('/published-concerts', [PublishedConcertsController::class, 'store'])->name('backstage.published-concerts.store');
     Route::get('/published-concerts/{id}/orders', [PublishedConcertOrdersController::class, 'index'])
         ->name('backstage.published-concert-orders.index');
+    Route::get('/concerts/{id}/messages/new', [ConcertMessagesController::class, 'create'])->name('backstage.concert-messages.new');
+    Route::post('/concerts/{id}/messages', [ConcertMessagesController::class, 'store'])->name('backstage.concert-messages.store');
 });
