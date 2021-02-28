@@ -181,4 +181,24 @@ class ConcertModelTest extends TestCase
         $this->assertEquals($concert->ticketsRemaining(), 200);
         $this->assertTrue($concert->isPublished());
     }
+
+    public function test_tickets_total_includes_all_kinds_of_tickets()
+    {
+        $concert = ConcertFactory::createPublished(['ticket_quantity' => 5]);
+        $order = Order::factory()->create(['concert_id' => $concert->id]);
+
+        $order->tickets()->saveMany($concert->tickets->take(2));
+
+        $this->assertEquals(5, $concert->ticketsTotal());
+    }
+
+    public function test_percent_sold_out()
+    {
+        $concert = ConcertFactory::createPublished(['ticket_quantity' => 7]);
+        $order = Order::factory()->create(['concert_id' => $concert->id]);
+
+        $order->tickets()->saveMany($concert->tickets->take(2));
+
+        $this->assertEquals(28.57, $concert->percentSoldOut());
+    }
 }
