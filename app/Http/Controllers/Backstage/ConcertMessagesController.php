@@ -19,6 +19,11 @@ class ConcertMessagesController extends Controller
 
     public function store($id)
     {
+        request()->validate([
+            'subject' => ['required'],
+            'message' => ['required']
+        ]);
+
         $concert = Auth::user()->concerts()->findOrFail($id);
 
         $message = $concert->attendeeMessages()->create(request(['subject', 'message']));

@@ -97,4 +97,72 @@ class MessageAttendeesTest extends TestCase
         $this->assertEquals(0, AttendeeMessage::count());
         Queue::assertNotPushed(SendAttendeeMessage::class);
     }
+
+    function test_a_guest_cannot_send_a_new_message_for_any_concerts()
+    {
+        // Arrange
+        Queue::fake();
+        $concert = ConcertFactory::createPublished();
+
+        // Act
+        $response = $this->post("/backstage/concerts/{$concert->id}/messages", [
+            'subject' => 'My subject',
+            'message' => 'My message',
+        ]);
+
+        // Assert
+        $response->assertRedirect('/login');
+        $this->assertEquals(0, AttendeeMessage::count());
+        Queue::assertNotPushed(SendAttendeeMessage::class);
+    }
+
+    function test_subject_is_required()
+    {
+        // Arrange
+        Queue::fake();
+        $user = User::factory()->create();
+        $concert = ConcertFactory::createPublished([
+            'user_id' => $user->id,
+        ]);
+
+        // Act
+        $response = $this->from("/backstage/concerts/{$concert->id}/messages/new")
+            ->actingAs($user)
+            ->post("/backstage/concerts/{$concert->id}/messages", [
+                'subject' => '',
+                'message' => 'My message',
+            ]);
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/messages/new");
+
+        $response->assertSessionHasErrors('subject');
+        $this->assertEquals(0, AttendeeMessage::count());
+        Queue::assertNotPushed(SendAttendeeMessage::class);
+    }
+
+    function test_message_is_required()
+    {
+        // Arrange
+        Queue::fake();
+        $user = User::factory()->create();
+        $concert = ConcertFactory::createPublished([
+            'user_id' => $user->id,
+        ]);
+
+        // Act
+        $response = $this->from("/backstage/concerts/{$concert->id}/messages/new")
+            ->actingAs($user)
+            ->post("/backstage/concerts/{$concert->id}/messages", [
+                'subject' => 'My subject',
+                'message' => '',
+            ]);
+
+        // Assert
+        $response->assertRedirect("/backstage/concerts/{$concert->id}/messages/new");
+
+        $response->assertSessionHasErrors('message');
+        $this->assertEquals(0, AttendeeMessage::count());
+        Queue::assertNotPushed(SendAttendeeMessage::class);
+    }
 }
