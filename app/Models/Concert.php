@@ -35,6 +35,13 @@ class Concert extends Model
         return Order::whereIn('id', $orderIds);
     }
 
+    public function recipients()
+    {
+        return $this->orders()->get()->map(function ($order) {
+            return $order->email;
+        });
+    }
+
     public function tickets()
     {
         return $this->hasMany(Ticket::class);

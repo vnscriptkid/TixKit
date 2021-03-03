@@ -2,12 +2,15 @@
 
 namespace App\Jobs;
 
+use App\Mail\AttendeeMessageEmail;
+use App\Models\AttendeeMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
 class SendAttendeeMessage implements ShouldQueue
 {
@@ -20,7 +23,7 @@ class SendAttendeeMessage implements ShouldQueue
      */
     public $attendeeMessage;
 
-    public function __construct($attendeeMessage)
+    public function __construct(AttendeeMessage $attendeeMessage)
     {
         $this->attendeeMessage = $attendeeMessage;
     }
@@ -32,6 +35,8 @@ class SendAttendeeMessage implements ShouldQueue
      */
     public function handle()
     {
-        //
+        $this->attendeeMessage->concert->recipients()->each(function ($recipient) {
+            Mail::to($recipient)->send(new AttendeeMessageEmail($this->attendeeMessage));
+        });
     }
 }
