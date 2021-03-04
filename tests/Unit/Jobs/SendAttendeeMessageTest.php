@@ -19,7 +19,6 @@ class SendAttendeeMessageTest extends TestCase
 
     public function test_it_send_the_message_to_all_attendees()
     {
-        $this->withoutExceptionHandling();
         // Assert
         Mail::fake();
         $concert = Concert::factory()->create([]);
@@ -37,15 +36,15 @@ class SendAttendeeMessageTest extends TestCase
         SendAttendeeMessage::dispatch($message); // call handle() internally
 
         // Assert
-        Mail::assertSent(AttendeeMessageEmail::class, function ($mail) use ($message) {
+        Mail::assertQueued(AttendeeMessageEmail::class, function ($mail) use ($message) {
             return $mail->hasTo('userA@gmail.com') && $message->is($mail->attendeeMessage);
         });
 
-        Mail::assertSent(AttendeeMessageEmail::class, function ($mail) use ($message) {
+        Mail::assertQueued(AttendeeMessageEmail::class, function ($mail) use ($message) {
             return $mail->hasTo('userB@gmail.com') && $message->is($mail->attendeeMessage);
         });
 
-        Mail::assertNotSent(AttendeeMessageEmail::class, function ($mail) {
+        Mail::assertNotQueued(AttendeeMessageEmail::class, function ($mail) {
             return $mail->hasTo('userC@gmail.com');
         });
     }
