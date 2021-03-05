@@ -12,7 +12,7 @@ class AttendeeMessageEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $attendeeMessage;
+    public AttendeeMessage $attendeeMessage;
 
     /**
      * Create a new message instance.
@@ -31,6 +31,7 @@ class AttendeeMessageEmail extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.attendee-message-email.blade')->subject($this->attendeeMessage->subject);
+        return $this->text('emails.attendee-message-email')
+            ->subject($this->attendeeMessage->subject);
     }
 }
