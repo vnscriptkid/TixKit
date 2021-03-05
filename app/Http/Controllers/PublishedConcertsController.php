@@ -11,10 +11,10 @@ class PublishedConcertsController extends Controller
     public function store()
     {
         request()->validate([
-            'id' => ['required']
+            'concert_id' => ['required']
         ]);
 
-        $concert = Auth::user()->concerts()->findOrFail(request('id'));
+        $concert = Auth::user()->concerts()->findOrFail(request('concert_id'));
 
         abort_if($concert->isPublished(), 302);
 

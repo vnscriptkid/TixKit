@@ -25,7 +25,7 @@ class PublishConcertTest extends TestCase
 
         // Act
         $response = $this->actingAs($user)->post('/backstage/published-concerts', [
-            'id' => $concert->id
+            'concert_id' => $concert->id
         ]);
 
         // Assert
@@ -48,7 +48,7 @@ class PublishConcertTest extends TestCase
 
         // Act
         $response = $this->actingAs($me)->post('/backstage/published-concerts', [
-            'id' => $concertOfOther->id
+            'concert_id' => $concertOfOther->id
         ]);
 
         // Assert
@@ -71,7 +71,7 @@ class PublishConcertTest extends TestCase
 
         // Act
         $response = $this->actingAs($me)->post('/backstage/published-concerts', [
-            'id' => $concertOfOther->id
+            'concert_id' => $concertOfOther->id
         ]);
 
         // Assert
@@ -93,7 +93,7 @@ class PublishConcertTest extends TestCase
 
         // Act
         $response = $this->actingAs($me)->post('/backstage/published-concerts', [
-            'id' => $concertOfOther->id
+            'concert_id' => $concertOfOther->id
         ]);
 
         // Assert
@@ -115,11 +115,11 @@ class PublishConcertTest extends TestCase
 
         // Act
         $response = $this->actingAs($user)->post('/backstage/published-concerts', [
-            'id' => ''
+            'concert_id' => ''
         ]);
 
         // Assert
-        $response->assertSessionHasErrors(['id']);
+        $response->assertSessionHasErrors(['concert_id']);
         $this->assertFalse($concert->fresh()->isPublished());
     }
 
@@ -130,7 +130,7 @@ class PublishConcertTest extends TestCase
 
         // Act
         $response = $this->actingAs($user)->post('/backstage/published-concerts', [
-            'id' => 999
+            'concert_id' => 999
         ]);
 
         // Assert
@@ -150,7 +150,7 @@ class PublishConcertTest extends TestCase
 
         // Act
         $response = $this->post('/backstage/published-concerts', [
-            'id' => $concert->id
+            'concert_id' => $concert->id
         ]);
 
         // Assert
