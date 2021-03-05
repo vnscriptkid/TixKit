@@ -35,16 +35,6 @@ class SendAttendeeMessage implements ShouldQueue
      */
     public function handle()
     {
-        // $this->attendeeMessage->concert->recipients()->each(function ($recipient) {
-        //     Mail::to($recipient)->queue(new AttendeeMessageEmail($this->attendeeMessage));
-        // });
-
-        // $this->attendeeMessage->orders()->chunk(100, function ($orders) {
-        //     $orders->pluck('email')->each(function ($recipient) {
-        //         Mail::to($recipient)->queue(new AttendeeMessageEmail($this->attendeeMessage));
-        //     });
-        // });
-
         $this->attendeeMessage->withChunkedRecipients(100, function ($recipients) {
             $recipients->each(function ($recipient) {
                 Mail::to($recipient)->queue(new AttendeeMessageEmail($this->attendeeMessage));
