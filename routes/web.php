@@ -4,6 +4,7 @@ use App\Http\Controllers\Backstage\ConcertMessagesController;
 use App\Http\Controllers\Backstage\ConcertsController as BackstageConcertsController;
 use App\Http\Controllers\ConcertOrdersController;
 use App\Http\Controllers\ConcertsController;
+use App\Http\Controllers\InvitationsController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\PublishedConcertOrdersController;
@@ -32,6 +33,8 @@ Route::get('/orders/{confirmation_number}', [OrdersController::class, 'show']);
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/login', [LoginController::class, 'showLoginForm']);
+
+Route::get('/invitations/{code}', [InvitationsController::class, 'show']);
 
 Route::middleware(['auth'])->prefix('backstage')->group(function () {
     Route::get('/concerts/new', [BackstageConcertsController::class, 'create'])->name('backstage.concerts.new');
