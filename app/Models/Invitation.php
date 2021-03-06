@@ -9,6 +9,8 @@ class Invitation extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public static function findByCode(string $code)
     {
         return self::where('code', $code)->firstOrFail();

@@ -6,6 +6,7 @@ use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AcceptInvitationTest extends TestCase
@@ -51,5 +52,30 @@ class AcceptInvitationTest extends TestCase
 
         // Assert
         $response->assertStatus(404);
+    }
+
+    public function test_regsitering_user_with_valid_code()
+    {
+        // Arrange
+        $invitation = Invitation::factory()->create([
+            'code' => 'INVITATIONCODE123',
+            'user_id' => null
+        ]);
+
+        // Act
+        $response = $this->post('/register', [
+            'email' => 'tom@gmail.com',
+            'password' => '123456',
+            'invitation_code' => 'INVITATIONCODE123'
+        ]);
+
+        // Assert
+        $response->assertRedirect('/backstage/concerts');
+        $user = User::firstOrFail();
+        $this->assertEquals(1, User::count());
+        $this->assertAuthenticatedAs($user);
+        $this->assertEquals($user->email, 'tom@gmail.com');
+        $this->assertTrue(Hash::check('123456', $user->password));
+        $this->assertTrue($invitation->fresh()->hasBeenUsed());
     }
 }

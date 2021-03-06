@@ -9,6 +9,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\PublishedConcertOrdersController;
 use App\Http\Controllers\PublishedConcertsController;
+use App\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,7 @@ Route::get('/orders/{confirmation_number}', [OrdersController::class, 'show']);
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/login', [LoginController::class, 'showLoginForm']);
+Route::post('/register', [RegisterController::class, 'register']);
 
 Route::get('/invitations/{code}', [InvitationsController::class, 'show']);
 
