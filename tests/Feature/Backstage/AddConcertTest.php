@@ -353,10 +353,6 @@ class AddConcertTest extends TestCase
             $response->assertRedirect('/backstage/concerts');
             $this->assertNotNull($concert->poster_image_path);
             Storage::disk('public')->assertExists($concert->poster_image_path);
-            $this->assertFileEquals(
-                $file->getPathname(),
-                Storage::disk('public')->path($concert->poster_image_path)
-            );
         });
     }
 
