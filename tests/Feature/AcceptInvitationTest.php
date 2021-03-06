@@ -77,5 +77,42 @@ class AcceptInvitationTest extends TestCase
         $this->assertEquals($user->email, 'tom@gmail.com');
         $this->assertTrue(Hash::check('123456', $user->password));
         $this->assertTrue($invitation->fresh()->hasBeenUsed());
+        $this->assertTrue($invitation->fresh()->user->is($user));
+    }
+
+    public function test_registering_with_invalid_code_should_return_404()
+    {
+        // Act
+        $response = $this->post('/register', [
+            'email' => 'tom@gmail.com',
+            'password' => '123456',
+            'invitation_code' => 'FAKECODE'
+        ]);
+
+        // Assert
+        $response->assertStatus(404);
+        $this->assertEquals(0, User::count());
+    }
+
+    public function test_registering_user_using_used_code()
+    {
+        // Arrange
+        Invitation::factory()->create([
+            'code' => 'INVITATIONCODE123',
+            'user_id' => User::factory()->create()->id
+        ]);
+
+        $this->assertEquals(1, User::count());
+
+        // Act
+        $response = $this->post('/register', [
+            'email' => 'tom@gmail.com',
+            'password' => '123456',
+            'invitation_code' => 'INVITATIONCODE123'
+        ]);
+
+        // Assert
+        $response->assertStatus(404);
+        $this->assertEquals(1, User::count());
     }
 }

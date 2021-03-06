@@ -20,4 +20,9 @@ class Invitation extends Model
     {
         return $this->user_id !== null;
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
