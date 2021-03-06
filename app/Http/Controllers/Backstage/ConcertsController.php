@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Backstage;
 
 use App\Http\Controllers\Controller;
 use App\Models\Concert;
+use App\NullFile;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class ConcertsController extends Controller
 {
@@ -28,6 +30,7 @@ class ConcertsController extends Controller
             'zip' => ['required'],
             'ticket_price' => ['required', 'numeric', 'min:5'],
             'ticket_quantity' => ['required', 'numeric', 'min:1', 'integer'],
+            'poster_image' => ['nullable', 'image', Rule::dimensions()->minWidth(600)->ratio(8.5 / 11)]
         ]);
 
         $concert = Concert::create([
@@ -46,10 +49,10 @@ class ConcertsController extends Controller
             'zip' => request('zip'),
             'additional_information' => request('additional_information'),
             'ticket_quantity' => (int) request('ticket_quantity'),
-            'poster_image_path' => request('poster_image')->store('posters', 's3')
+            'poster_image_path' => request('poster_image', new NullFile)->store('posters', 's3')
         ]);
 
-        return redirect()->route('concerts.show', $concert);
+        return redirect()->route('backstage.concerts.index');
     }
 
     public function index()
