@@ -213,4 +213,12 @@ class ConcertModelTest extends TestCase
 
         $this->assertEquals(36.14, $concert->revenueInDollars());
     }
+
+    public function test_has_poster()
+    {
+        $concert = Concert::factory()->create();
+        $this->assertFalse($concert->hasPoster());
+        $concert->update(['poster_image_path' => 'posters/example-poster.png']);
+        $this->assertTrue($concert->hasPoster());
+    }
 }

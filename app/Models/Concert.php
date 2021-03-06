@@ -135,4 +135,9 @@ class Concert extends Model
     {
         return number_format($this->orders()->sum('amount') / 100, 2);
     }
+
+    public function hasPoster()
+    {
+        return $this->poster_image_path !== null;
+    }
 }

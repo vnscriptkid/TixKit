@@ -15,7 +15,7 @@ class SchedulePosterImageProcessingTest extends TestsTestCase
 {
     use RefreshDatabase;
 
-    public function test_it_listens_for_added_event_and_queue_job_processing_image()
+    public function test_it_listens_for_added_event_and_queue_job_processing_image_if_poster_included()
     {
         // Arrange
         Queue::fake();
@@ -30,5 +30,18 @@ class SchedulePosterImageProcessingTest extends TestsTestCase
         Queue::assertPushed(ProcessPosterImage::class, function ($job) use ($concert) {
             return $concert->is($job->concert);
         });
+    }
+
+    public function test_it_does_not_queue_job_processing_image_if_no_poster_included()
+    {
+        // Arrange
+        Queue::fake();
+        $concert = ConcertFactory::createUnpublished(['poster_image_path' => null]);
+
+        // Act
+        ConcertAdded::dispatch($concert);
+
+        // Assert
+        Queue::assertNotPushed(ProcessPosterImage::class);
     }
 }
