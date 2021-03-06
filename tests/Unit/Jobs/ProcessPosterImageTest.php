@@ -12,6 +12,13 @@ class ProcessPosterImageTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function assertSameAsOriginalImage()
+    {
+        $optimizedImagePrepared = file_get_contents(base_path('tests/__fixtures__/optimized-poster.png'));
+        $optimizedImageNow = Storage::disk('public')->get('posters/example-poster.png');
+        $this->assertEquals($optimizedImagePrepared, $optimizedImageNow);
+    }
+
     public function test_it_resizes_image_to_600px_wide()
     {
         // Arrange
@@ -32,6 +39,7 @@ class ProcessPosterImageTest extends TestCase
         list($width, $height) = getimagesizefromstring($resizedImage);
         $this->assertEquals(600, $width);
         $this->assertEquals(776, $height);
+        $this->assertSameAsOriginalImage();
     }
 
     public function test_it_optimizes_the_image()
@@ -53,5 +61,6 @@ class ProcessPosterImageTest extends TestCase
         $originalFileSize = filesize(base_path('tests/__fixtures__/small-unoptimized-poster.png'));
         $optimizedFileSize = Storage::disk('public')->size('posters/example-poster.png');
         $this->assertTrue($optimizedFileSize < $originalFileSize);
+        $this->assertSameAsOriginalImage();
     }
 }
