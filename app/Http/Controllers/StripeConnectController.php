@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Stripe\Service\OAuthService;
 
 class StripeConnectController extends Controller
 {
@@ -37,5 +36,10 @@ class StripeConnectController extends Controller
         ]);
 
         return redirect()->route('backstage.concerts.index');
+    }
+
+    public function connect()
+    {
+        return view('backstage.stripe-connect.connect');
     }
 }
