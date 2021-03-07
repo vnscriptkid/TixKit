@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Stripe\Service\OAuthService;
 
 class StripeConnectController extends Controller
 {
@@ -18,5 +20,22 @@ class StripeConnectController extends Controller
         ]);
 
         return redirect($url);
+    }
+
+    public function redirect()
+    {
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+        $response = \Stripe\OAuth::token([
+            'grant_type' => 'authorization_code',
+            'code' => request('code'),
+        ]);
+
+        Auth::user()->update([
+            'stripe_account_id' => $response['stripe_user_id'],
+            'stripe_access_token' => $response['access_token']
+        ]);
+
+        return redirect()->route('backstage.concerts.index');
     }
 }
