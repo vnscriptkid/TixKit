@@ -12,12 +12,12 @@ trait PaymentGatewayContractTests
     {
         $paymentGateway = $this->getPaymentGateway();
 
-        $paymentGateway->charge(1000, $paymentGateway->getValidTestToken());
-        $paymentGateway->charge(2000, $paymentGateway->getValidTestToken());
+        $paymentGateway->charge(1000, $paymentGateway->getValidTestToken(), 'test-acc-id-123');
+        $paymentGateway->charge(2000, $paymentGateway->getValidTestToken(), 'test-acc-id-123');
 
         $newCharges = $paymentGateway->getNewChargesDuring(function ($gateway) {
-            $gateway->charge(1200, $gateway->getValidTestToken());
-            $gateway->charge(3000, $gateway->getValidTestToken());
+            $gateway->charge(1200, $gateway->getValidTestToken(), 'test-acc-id-123');
+            $gateway->charge(3000, $gateway->getValidTestToken(), 'test-acc-id-123');
         });
 
         $this->assertCount(2, $newCharges);
@@ -29,7 +29,7 @@ trait PaymentGatewayContractTests
         $paymentGateway = $this->getPaymentGateway();
 
         $newCharges = $paymentGateway->getNewChargesDuring(function ($gateway) {
-            $gateway->charge(1200, $gateway->getValidTestToken());
+            $gateway->charge(1200, $gateway->getValidTestToken(), 'test-acc-id-123');
         });
 
         $this->assertCount(1, $newCharges);
@@ -42,7 +42,7 @@ trait PaymentGatewayContractTests
 
         $newCharges = $paymentGateway->getNewChargesDuring(function ($gateway) {
             try {
-                $gateway->charge(1200, 'invalid-payment-token');
+                $gateway->charge(1200, 'invalid-payment-token', 'test-acc-id-123');
             } catch (PaymentFailedException $e) {
                 return;
             }
@@ -56,9 +56,9 @@ trait PaymentGatewayContractTests
     {
         $paymentGateway = $this->getPaymentGateway();
 
-        $charge = $paymentGateway->charge(1000, $paymentGateway->getValidTestToken($paymentGateway::TEST_CARD_NUMBER), 'test-acc-1');
+        $charge = $paymentGateway->charge(1000, $paymentGateway->getValidTestToken($paymentGateway::TEST_CARD_NUMBER), 'test-acc-id-123');
 
         $this->assertEquals(substr($paymentGateway::TEST_CARD_NUMBER, -4), $charge->cardLastFour());
-        $this->assertEquals('test-acc-1', $charge->destination());
+        $this->assertEquals('test-acc-id-123', $charge->destination());
     }
 }

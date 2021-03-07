@@ -15,7 +15,7 @@ class FakePaymentGateway implements PaymentGateway
     public function __construct()
     {
         $this->charges = collect();
-        $this->tokens = collect(); // [token => cardNumber]
+        $this->tokens = collect();
     }
 
     public function getValidTestToken($cardNumber = self::TEST_CARD_NUMBER)
