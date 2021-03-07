@@ -12,12 +12,12 @@ trait PaymentGatewayContractTests
     {
         $paymentGateway = $this->getPaymentGateway();
 
-        $paymentGateway->charge(1000, $paymentGateway->getValidTestToken(), 'test-acc-id-123');
-        $paymentGateway->charge(2000, $paymentGateway->getValidTestToken(), 'test-acc-id-123');
+        $paymentGateway->charge(1000, $paymentGateway->getValidTestToken(), env('PROMOTER_STRIPE_ACCOUNT_ID'));
+        $paymentGateway->charge(2000, $paymentGateway->getValidTestToken(), env('PROMOTER_STRIPE_ACCOUNT_ID'));
 
         $newCharges = $paymentGateway->getNewChargesDuring(function ($gateway) {
-            $gateway->charge(1200, $gateway->getValidTestToken(), 'test-acc-id-123');
-            $gateway->charge(3000, $gateway->getValidTestToken(), 'test-acc-id-123');
+            $gateway->charge(1200, $gateway->getValidTestToken(), env('PROMOTER_STRIPE_ACCOUNT_ID'));
+            $gateway->charge(3000, $gateway->getValidTestToken(), env('PROMOTER_STRIPE_ACCOUNT_ID'));
         });
 
         $this->assertCount(2, $newCharges);
@@ -29,7 +29,7 @@ trait PaymentGatewayContractTests
         $paymentGateway = $this->getPaymentGateway();
 
         $newCharges = $paymentGateway->getNewChargesDuring(function ($gateway) {
-            $gateway->charge(1200, $gateway->getValidTestToken(), 'test-acc-id-123');
+            $gateway->charge(1200, $gateway->getValidTestToken(), env('PROMOTER_STRIPE_ACCOUNT_ID'));
         });
 
         $this->assertCount(1, $newCharges);
@@ -42,7 +42,7 @@ trait PaymentGatewayContractTests
 
         $newCharges = $paymentGateway->getNewChargesDuring(function ($gateway) {
             try {
-                $gateway->charge(1200, 'invalid-payment-token', 'test-acc-id-123');
+                $gateway->charge(1200, 'invalid-payment-token', env('PROMOTER_STRIPE_ACCOUNT_ID'));
             } catch (PaymentFailedException $e) {
                 return;
             }
@@ -56,9 +56,9 @@ trait PaymentGatewayContractTests
     {
         $paymentGateway = $this->getPaymentGateway();
 
-        $charge = $paymentGateway->charge(1000, $paymentGateway->getValidTestToken($paymentGateway::TEST_CARD_NUMBER), 'test-acc-id-123');
+        $charge = $paymentGateway->charge(1000, $paymentGateway->getValidTestToken($paymentGateway::TEST_CARD_NUMBER), env('PROMOTER_STRIPE_ACCOUNT_ID'));
 
         $this->assertEquals(substr($paymentGateway::TEST_CARD_NUMBER, -4), $charge->cardLastFour());
-        $this->assertEquals('test-acc-id-123', $charge->destination());
+        $this->assertEquals(env('PROMOTER_STRIPE_ACCOUNT_ID'), $charge->destination());
     }
 }

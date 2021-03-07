@@ -21,6 +21,10 @@ class StripePaymentGateway implements PaymentGateway
                 'amount' => $amount,
                 'source' => $token,
                 'currency' => 'usd',
+                'destination' => [
+                    'account' => $destinationAccountId,
+                    'amount' => $amount * .9
+                ]
             ], ['api_key' => $this->apiKey]);
 
             return new Charge([
