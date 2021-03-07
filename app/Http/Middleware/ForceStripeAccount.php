@@ -15,7 +15,7 @@ class ForceStripeAccount
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, $next)
     {
         if (Auth::user()->stripe_account_id === null) {
             return redirect()->route('backstage.stripe-connect.connect');

@@ -31,4 +31,33 @@ class ForceStripeAccountTest extends TestCase
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals(route('backstage.stripe-connect.connect'), $response->getTargetUrl());
     }
+
+    public function test_user_with_a_stripe_account_can_continue()
+    {
+        // Arrange
+        $this->be(User::factory()->create([
+            'stripe_account_id' => 'a-valid-stripe-account'
+        ]));
+        $middleware = new ForceStripeAccount();
+
+        $next = new class
+        {
+            public $called = false;
+
+            public function __invoke($request)
+            {
+                $this->called = true;
+                return $request;
+            }
+        };
+
+        $request = new Request;
+
+        // Act
+        $response = $middleware->handle($request, $next);
+
+        // Assert
+        $this->assertTrue($next->called);
+        $this->assertSame($request, $response);
+    }
 }
