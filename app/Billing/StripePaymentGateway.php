@@ -14,7 +14,7 @@ class StripePaymentGateway implements PaymentGateway
         $this->apiKey = $apiKey;
     }
 
-    public function charge($amount, $token)
+    public function charge($amount, $token, $destinationAccountId)
     {
         try {
             $charge = \Stripe\Charge::create([
@@ -25,7 +25,8 @@ class StripePaymentGateway implements PaymentGateway
 
             return new Charge([
                 'amount' => $charge['amount'],
-                'card_last_four' => $charge['source']['last4']
+                'card_last_four' => $charge['source']['last4'],
+                'destination' => $destinationAccountId
             ]);
         } catch (InvalidRequestException $e) {
             throw new PaymentFailedException;
