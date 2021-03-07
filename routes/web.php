@@ -10,6 +10,7 @@ use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\PublishedConcertOrdersController;
 use App\Http\Controllers\PublishedConcertsController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\StripeConnectController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -49,4 +50,5 @@ Route::middleware(['auth'])->prefix('backstage')->group(function () {
         ->name('backstage.published-concert-orders.index');
     Route::get('/concerts/{id}/messages/new', [ConcertMessagesController::class, 'create'])->name('backstage.concert-messages.new');
     Route::post('/concerts/{id}/messages', [ConcertMessagesController::class, 'store'])->name('backstage.concert-messages.store');
+    Route::get('/stripe-connect/authorize', [StripeConnectController::class, 'authorizeRedirect']);
 });
