@@ -18,4 +18,9 @@ class Charge
     {
         return $this->data['card_last_four'];
     }
+
+    public function destination()
+    {
+        return $this->data['destination'];
+    }
 }

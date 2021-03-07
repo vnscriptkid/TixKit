@@ -10,6 +10,7 @@ use App\Billing\PaymentGateway;
 use App\Facades\OrderConfirmationNumber;
 use App\Facades\TicketCode;
 use App\Mail\OrderConfirmationEmail;
+use App\Models\User;
 use Database\Factories\ConcertFactory;
 use Illuminate\Support\Facades\Mail;
 
@@ -59,9 +60,11 @@ class PurchaseTicketTest extends TestCase
     {
         $this->withoutExceptionHandling();
         // Arrange
+        $user = User::factory()->create(['stripe_account_id' => 'test-acc-123']);
         $concert = Concert::factory()->create([
             'ticket_price' => 3740,
-            'ticket_quantity' => 3
+            'ticket_quantity' => 3,
+            'user_id' => $user->id
         ]);
         $concert->publish();
 
@@ -90,6 +93,7 @@ class PurchaseTicketTest extends TestCase
         $this->assertTrue($concert->hasOrderFrom('john@gmail.com'));
         $order = $concert->ordersFrom('john@gmail.com')->first();
         $this->assertEquals(3, $order->ticketQuantity());
+        $this->assertEquals(3740 * 3, $this->paymentGateway->totalChargesFor('test-acc-123'));
 
         Mail::assertSent(OrderConfirmationEmail::class, function ($mail) use ($order) {
             return $mail->hasTo('john@gmail.com')
