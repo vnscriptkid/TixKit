@@ -24,11 +24,11 @@
                                     <p class="wt-medium text-dark-soft text-ellipsis">{{ $concert->subtitle }}</p>
                                 </div>
                                 <p class="text-sm m-xs-b-2">
-                                    @icon('location', 'zondicon-sm text-dark-soft m-xs-r-1')
+                                    <i class="fas fa-map-marker-alt"></i>
                                     {{ $concert->venue }} &ndash; {{ $concert->city }}, {{ $concert->state }}
                                 </p>
                                 <p class="text-sm">
-                                    @icon('calendar', 'zondicon-sm text-dark-soft m-xs-r-1')
+                                    <i class="far fa-calendar-alt"></i>
                                     {{ $concert->formatted_date }} @ {{ $concert->formatted_start_time }}
                                 </p>
                             </div>
@@ -55,11 +55,11 @@
                                     <p class="wt-medium text-dark-soft text-ellipsis">{{ $concert->subtitle }}</p>
                                 </div>
                                 <p class="text-sm m-xs-b-2">
-                                    @icon('location', 'zondicon-sm text-dark-soft m-xs-r-1')
+                                    <i class="fas fa-map-marker-alt"></i>
                                     {{ $concert->venue }} &ndash; {{ $concert->city }}, {{ $concert->state }}
                                 </p>
                                 <p class="text-sm">
-                                    @icon('calendar', 'zondicon-sm text-dark-soft m-xs-r-1')
+                                    <i class="far fa-calendar-alt"></i>
                                     {{ $concert->formatted_date }} @ {{ $concert->formatted_start_time }}
                                 </p>
                             </div>
@@ -69,7 +69,7 @@
                                     {{ csrf_field() }}
                                     <input type="hidden" name="concert_id" value="{{ $concert->id }}">
                                     <button type="submit" class="btn btn-sm btn-primary">Publish</button>
-                                </form>
+                                </form> 
                             </div>
                         </div>
                     </div>

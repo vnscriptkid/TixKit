@@ -13,7 +13,7 @@
                         <a href="{{ route('backstage.concerts.index') }}" class="link link-light m-xs-r-6">
                             Your Concerts
                         </a>
-                        <form class="inline-block" action="{{ route('auth.logout') }}" method="POST">
+                        <form class="inline-block" action="{{ route('logout') }}" method="POST">
                             {{ csrf_field() }}
                             <button type="submit" class="link link-light">Log out</button>
                         </form>

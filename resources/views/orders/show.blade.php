@@ -36,7 +36,7 @@
                             <div class="col-sm">
                                 <div class="media-object">
                                     <div class="media-left">
-                                        @icon('calendar', 'text-brand-muted')
+                                        <i class="fas fa-calendar-alt"></i>
                                     </div>
                                     <div class="media-body p-xs-l-4">
                                         <p class="wt-bold">
@@ -53,7 +53,7 @@
                             <div class="col-sm">
                                 <div class="media-object">
                                     <div class="media-left">
-                                        @icon('location', 'text-brand-muted')
+                                        <i class="fas fa-map-marker-alt"></i>
                                     </div>
                                     <div class="media-body p-xs-l-4">
                                         <p class="wt-bold">{{ $ticket->concert->venue }}</p>
